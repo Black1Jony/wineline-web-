@@ -1,0 +1,36 @@
+.placeholder-text {
+  position: relative;
+  color: #999;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.slide-up {
+  animation: slideUpFade 0.3s ease forwards;
+}
+
+.slide-down {
+  animation: slideDownFade 0.3s ease forwards;
+}
+
+@keyframes slideUpFade {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes slideDownFade {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,30 @@
+
+.shadowHeader {
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
+}
+
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+@keyframes wineDrip {
+  0% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(80%) scaleY(0.8); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+.wineDrip {
+  position: relative;
+}
+
+.wineDrip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 2px;
+  height: 10px;
+  background: linear-gradient(to bottom, #ff3366, transparent);
+  animation: wineDrip 2s infinite;
+}
