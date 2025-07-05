@@ -1,95 +1,230 @@
-import './logincss.css';
-import { Form, Input, Button, Checkbox } from "antd";
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-const Login = () => {
+import { useState } from "react";
+import "./logincss.css";
+import { useNavigate } from "react-router-dom";
+import {
+  registerWithEmail,
+  loginWithEmail,
+} from "../../utils/firebase/auth/loginAuth";
+
+export default function LoginPage() {
+  const [isLoginForm, setIsLoginForm] = useState(true);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  // Общие состояния для обеих форм
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
+  const token = localStorage.getItem("token");
+  
   const navigate = useNavigate();
+if (token) {
+    navigate("/");
+    return null; 
+}
+  const toggleForm = () => {
+    setIsLoginForm(!isLoginForm);
+    setError("");
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await loginWithEmail(email, password);
+      if (res !== "error" && res !== "errorData") {
+        localStorage.setItem("token", res.accessToken);
+        navigate("/");
+      } else {
+        setError("Неверный email или пароль");
+      }
+    } catch (err) {
+      setError("Ошибка при входе");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    if (password !== repeatPassword) {
+      setError("Пароли не совпадают");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await registerWithEmail(
+        email,
+        password,
+        repeatPassword,
+        name
+      );
+      if (res !== "error" && res !== "errorData") {
+        localStorage.setItem("token", res.accessToken);
+        navigate("/");
+      } else {
+        setError("Ошибка при регистрации");
+      }
+    } catch (err) {
+      setError("Ошибка при регистрации");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <>
-      <div className="min-h-screen min-w-full flex items-center justify-center bg-[radial-gradient(circle_at_center,_#ff5e5e_0%,#b91c1c_30%,#7f1d1d_70%,#450a0a_100%)]">
-        <div className="bg-[#9d1a1a]/90 backdrop-blur-sm p-8 rounded-xl shadow-2xl border border-[#ef4444]/30 w-[90%] flex flex-col items-center min-h-[450px] 2xl:w-[25%] xl:w-[32%] lg:w-[37%] md:w-[56%] sm:w-[70%]">
-          <h1 className="text-3xl font-extrabold text-center text-white mb-8 font-mono tracking-wider">
-            wineLIne
-          </h1>
+    <div className="auth-page">
+      <div className="auth-container">
+        <div className="auth-side gradient-bg">
+          <h2>Добро пожаловать!</h2>
+          <p>Войдите или зарегистрируйтесь для доступа к сервису.</p>
+          <div className="social-buttons">
+            <button className="social-btn google">
+              <i className="fab fa-google"></i> Google
+            </button>
+            <button className="social-btn facebook">
+              <i className="fab fa-facebook-f"></i> Facebook
+            </button>
+          </div>
+        </div>
 
-          <Form
-            name="login_form"
-            initialValues={{ remember: true }}
-            layout="vertical"
-            className="w-full"
-          >
-            <Form.Item
-              label={
-                <span className="text-white/80 text-sm font-medium">
-                  Username
-                </span>
-              }
-              name="username"
-              rules={[
-                { required: true, message: "Please input your username!" },
-              ]}
-            >
-              <Input
-                className="bg-[#7f1d1d]/50 border-[#ef4444]/30 hover:border-[#ef4444]/50 text-white placeholder-white/50 rounded-lg h-10"
-                placeholder="Enter your username"
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </Form.Item>
+        <div className="auth-form-container justify-center items-center">
+          <div className={`form-toggle ${isLoginForm ? "" : "flipped"}`}>
+            {/* Форма входа */}
+            <div className="form-front mt-13">
+              <h2>Вход в аккаунт</h2>
+              {error && <div className="error-message">{error}</div>}
 
-            <Form.Item
-              label={
-                <span className="text-white/80 text-sm font-medium">
-                  Password
-                </span>
-              }
-              name="password"
-              rules={[
-                { required: true, message: "Please input your password!" },
-              ]}
-            >
-              <Input.Password
-                className="bg-[#7f1d1d]/50 border-[#ef4444]/30 hover:border-[#ef4444]/50 text-white placeholder-white/50 rounded-lg h-10"
-                placeholder="Enter your password"
-              />
-            </Form.Item>
+              <form className="auth-form" onSubmit={handleLogin}>
+                <div className="input-group">
+                  <i className="fas fa-envelope"></i>
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
 
-            <Form.Item name="remember" valuePropName="checked" className="mb-6 flex items-center">
-              <Checkbox className="[&>span]:text-white/80 [&>span:hover]:text-white">
-                Remember me
-              </Checkbox>
-            </Form.Item>
+                <div className="input-group">
+                  <i className="fas fa-lock"></i>
+                  <input
+                    type="password"
+                    placeholder="Пароль"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
 
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="w-full bg-gradient-to-r from-[#ef4444] to-[#b91c1c] hover:from-[#dc2626] hover:to-[#991b1b] text-white font-medium h-10 rounded-lg shadow-md transition-all duration-300 border-none"
-              >
-                Sign In
-              </Button>
-            </Form.Item>
+                <div className="form-options">
+                  <label>
+                    <input type="checkbox" /> Запомнить меня
+                  </label>
+                </div>
 
-            <div className="text-center mt-4">
-              <span
-                className="text-white/70 hover:text-white text-sm transition-colors"
-              >
-                Forgot password?
-              </span>
+                <button type="submit" className="btn-submit" disabled={loading}>
+                  {loading ? "Загрузка..." : "Войти"}
+                </button>
+
+                <p className="form-switch">
+                  Нет аккаунта?{" "}
+                  <button
+                    type="button"
+                    onClick={toggleForm}
+                    className="text-link"
+                  >
+                    Зарегистрироваться
+                  </button>
+                </p>
+              </form>
             </div>
-          </Form>
 
-          <div className="mt-8 text-white/60 text-xs">
-            Don't have an account?{" "}
-           <span className="text-white/80 hover:text-white font-medium " onClick={()=> navigate('/signup')}>
-              Sign up
-            </span>
+            {/* Форма регистрации */}
+            <div className="form-back">
+              <h2>Создать аккаунт</h2>
+              {error && <div className="error-message">{error}</div>}
+
+              <form className="auth-form" onSubmit={handleRegister}>
+                <div className="input-group">
+                  <i className="fas fa-user"></i>
+                  <input
+                    type="text"
+                    placeholder="Имя"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+
+                <div className="input-group">
+                  <i className="fas fa-envelope"></i>
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+
+                <div className="input-group">
+                  <i className="fas fa-lock"></i>
+                  <input
+                    type="password"
+                    placeholder="Пароль"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    minLength={6}
+                  />
+                </div>
+
+                <div className="input-group">
+                  <i className="fas fa-lock"></i>
+                  <input
+                    type="password"
+                    placeholder="Повторите пароль"
+                    required
+                    value={repeatPassword}
+                    onChange={(e) => setRepeatPassword(e.target.value)}
+                    minLength={6}
+                  />
+                </div>
+
+                <label className="terms-checkbox">
+                  <input type="checkbox" required />Я согласен с{" "}
+                  <button type="button" className="text-link">
+                    условиями
+                  </button>
+                </label>
+
+                <button type="submit" className="btn-submit" disabled={loading}>
+                  {loading ? "Загрузка..." : "Зарегистрироваться"}
+                </button>
+
+                <p className="form-switch">
+                  Уже есть аккаунт?{" "}
+                  <button
+                    type="button"
+                    onClick={toggleForm}
+                    className="text-link"
+                  >
+                    Войти
+                  </button>
+                </p>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
-};
-
-export default Login;
+}

@@ -1,4 +1,4 @@
-import Swiper from "swiper"
+import {Swiper, SwiperSlide} from "swiper/react"
 const SwiperWine = () => {
   return <>
   

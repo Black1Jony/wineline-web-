@@ -1,3 +1,161 @@
-.poppins{
-    font-family: 'Poppins', sans-serif;
+/* Основные стили */
+.auth-page {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.auth-container {
+  display: flex;
+  max-width: 1000px;
+  width: 100%;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Левая часть (градиент) */
+.auth-side {
+  flex: 1;
+  padding: 2.5rem;
+  color: white;
+  display: none; /* Скрыто на мобильных */
+}
+
+@media (min-width: 768px) {
+  .auth-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.social-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.social-btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.social-btn.google {
+  background: white;
+  color: #7c3aed;
+}
+
+.social-btn.facebook {
+  background: white;
+  color: #2563eb;
+}
+
+/* Правая часть (форма) */
+.auth-form-container {
+  flex: 1;
+  padding: 2rem;
+  position: relative;
+  min-height: 500px;
+}
+
+.form-toggle {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s ease;
+  transform-style: preserve-3d;
+}
+
+.form-toggle.flipped {
+  transform: rotateY(180deg);
+}
+
+.form-front,
+.form-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  padding: 1rem;
+}
+
+.form-back {
+  transform: rotateY(180deg);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.input-group i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-submit {
+  background: linear-gradient(to right, #667eea, #764ba2);
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.text-link {
+  background: none;
+  border: none;
+  color: #7c3aed;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 500;
+}
+
+.form-switch {
+  text-align: center;
+  color: #4b5563;
 }
