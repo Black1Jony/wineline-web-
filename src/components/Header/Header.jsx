@@ -6,7 +6,7 @@ import InputPlaceHolder from "../Input/InputPlaceHolder";
 const Header = (props) => {
   const navigate = useNavigate();
   const [isHidden, setIsHidden] = useState(false);
-  const ismenu = !props.ismenu || false ;
+  const ismenu = !props.ismenu || false;
   const tovars = [
     { name: "В подарочной", path: "/catalog/gift" },
     { name: "Вино", path: "/catalog/wine" },
@@ -41,7 +41,9 @@ const Header = (props) => {
   return (
     <div className="relative">
       <div
-        className={`fixed top-0 left-0 w-full z-50 translate-y-0 shadow-lg transition-transform duration-300 ease-in-out"
+        className={`fixed top-0 left-0 w-full z-50 translate-y-0 ${
+          isHidden && "shadow-lg"
+        } transition-transform duration-300 ease-in-out"
         `}
       >
         <div className="w-full h-16 flex justify-between items-center px-6 md:px-16 bg-white">
@@ -82,8 +84,7 @@ const Header = (props) => {
             </div>
             <div
               className="flex flex-col items-center cursor-pointer "
-              onClick={() =>{
-                
+              onClick={() => {
                 if (!localStorage.getItem("token")) {
                   navigate("/login");
                 } else {
@@ -111,23 +112,25 @@ const Header = (props) => {
 
         {ismenu ? (
           <div
-            className={`w-full bg-white px-6 md:px-16 mt-1 hidden md:flex items-center gap-4 rounded-b-xl justify-between
-    transition-[max-height] duration-200 ease-in-out overflow-hidden
-    ${isHidden && ismenu ? "max-h-0" : "max-h-40 "}`}
+            className={`w-full bg-white px-6 md:px-16 transition-all duration-300 ease-in-out overflow-hidden ${
+              isHidden ? "h-0 opacity-0 pt-0 pb-0" : "h-auto opacity-100 py-4"
+            }`}
           >
-            {tovars.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => navigate(item.path)}
-                className={`text-[15px] font-medium px-4 py-2 rounded-full mb-2 mt-2 cursor-pointer transition-all duration-200 hover:bg-[#eaeaea] hover:text-black ${
-                  item.name === "акции%"
-                    ? "text-red-500 font-semibold"
-                    : "text-gray-700"
-                }`}
-              >
-                {item.name}
-              </div>
-            ))}
+            <div className="flex flex-wrap items-center gap-4 justify-between">
+              {tovars.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => navigate(item.path)}
+                  className={`text-[15px] font-medium px-4 py-2 rounded-full cursor-pointer  transition-all duration-200 hover:bg-[#eaeaea] hover:text-black ${
+                    item.name === "акции%"
+                      ? "text-red-500 font-semibold"
+                      : "text-gray-700"
+                  }`}
+                >
+                  {item.name}
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
       </div>
