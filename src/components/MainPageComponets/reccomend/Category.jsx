@@ -27,4 +27,3 @@ const Category = () => {
 }
 
 export default Category
-//git commit -m "сделал категории и улучшил свайпер"
