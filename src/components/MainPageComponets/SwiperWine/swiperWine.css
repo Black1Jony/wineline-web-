@@ -1,0 +1,21 @@
+.swiper-button-prev,
+.swiper-button-next {
+  color: white;
+  background-color: rgb(235, 235, 235);
+  width: 30px;
+  font-size: 0.1rem;
+  font-weight: 900;
+  color: #000;
+  height: 30px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background-color: rgba(255, 253, 253, 0.8);
+}
+.swiper-button-prev:after,
+.swiper-button-next:after {
+  font-size: 15px !important; /* Размер иконки */
+}

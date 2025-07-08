@@ -1,4 +1,4 @@
-const category = [
+export const category = [
     {
         id: 1,
         name: "Красное вино",
@@ -22,7 +22,7 @@ const category = [
     {
         id:5,
         name: "джин",
-        image: "/src/assets/bottles/gin.png",
+        image: "/src/assets/bottles/gin.webp",
     },
     {
         id: 6,
