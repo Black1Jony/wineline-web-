@@ -1,3 +1,23 @@
 @import "tailwindcss";
 @import 'antd/dist/reset.css';
 @import 'swiper/swiper-bundle.css';
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+@layer base {
+  html {
+    -ms-overflow-style: none;  
+    scrollbar-width: 40px;  
+  }
+  html::-webkit-scrollbar {
+    display: none
+  }
+}

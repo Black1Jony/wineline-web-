@@ -14,6 +14,7 @@ const Header = (props) => {
     { name: "Виски", path: "/catalog/whiskey" },
     { name: "Коньяк", path: "/catalog/konyak" },
     { name: "бокалы", path: "/catalog/glasses" },
+    { name: "джин", path: "/catalog/gin" },
     { name: "аксессуары", path: "/catalog/accessories" },
     { name: "дегустации", path: "/tastings" },
     { name: "акции%", path: "/promotions" },
@@ -116,7 +117,7 @@ const Header = (props) => {
               isHidden ? "h-0 opacity-0 pt-0 pb-0" : "h-auto opacity-100 py-4"
             }`}
           >
-            <div className="flex flex-wrap items-center gap-4 justify-between">
+            <div className="flex items-center gap-4 justify-between overflow-x-auto  ">
               {tovars.map((item, index) => (
                 <div
                   key={index}

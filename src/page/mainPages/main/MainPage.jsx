@@ -7,7 +7,7 @@ const MainPage = () => {
     <>
       <div className="relative">
         <Header />
-        <div className="w-[100%] px-16 flex gap-5 mt-40 justify-between items-center">
+        <div className="w-[100%]  px-16 flex gap-5 mt-40 justify-between items-center">
           <SwiperWine />
           <div>
             sometext

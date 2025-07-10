@@ -10,6 +10,8 @@ const InputPlaceHolder = () => {
     "шампанское",
     "новинки",
     "джин",
+    "красное вино",
+    "игристое"
   ];
   const [placeHolderCount, setPlaceHolderCount] = useState(0);
   const [animating, setAnimating] = useState(false);
