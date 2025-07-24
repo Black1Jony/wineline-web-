@@ -19,7 +19,7 @@ const RedBanner = () => {
 
       <div className="">
         <img
-          src="/src/assets/svgLogos/banner-degustation.png"
+          src="/assets/svgLogos/banner-degustation.png"
           alt="Glass of wine"
           className={s.bannerImage}
         />

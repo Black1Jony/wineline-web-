@@ -11,9 +11,9 @@ const OurBrends = () => {
 
   for (let index = 1; index <= 27; index++) {
     if ([3, 4, 15, 20].includes(index)) {
-      urls.push(`/src/assets/company/a${index}.jpg`);
+      urls.push(`/assets/company/a${index}.jpg`);
     } else {
-      urls.push(`/src/assets/company/a${index}.png`);
+      urls.push(`/assets/company/a${index}.png`);
     }
   }
 

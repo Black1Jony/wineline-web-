@@ -56,14 +56,14 @@ const Header = (props) => {
         <div className="w-full h-16 flex justify-between items-center px-4 sm:px-6 md:px-16 bg-white">
           <button className="block md:hidden p-2" onClick={toggleMobileMenu}>
             <img
-              src="/src/assets/svg/burger-menu-svgrepo-com.svg"
+              src="/assets/svg/burger-menu-svgrepo-com.svg"
               alt="Menu"
               className="w-6 h-6"
             />
           </button>
 
           <img
-            src="/src/assets/icons/WineLineIconText.svg"
+            src="/assets/icons/WineLineIconText.svg"
             alt="Logo"
             className="w-20 h-20 mx-auto md:mx-0 cursor-pointer"
             onClick={() => navigate("/")}
@@ -71,7 +71,7 @@ const Header = (props) => {
 
           <div className="hidden md:flex items-center gap-2">
             <img
-              src="/src/assets/svg/geo_icon_160074.svg"
+              src="/assets/svg/geo_icon_160074.svg"
               alt="Geo"
               className="w-5 h-5"
             />
@@ -84,7 +84,7 @@ const Header = (props) => {
           <div className="hidden md:flex items-center gap-4 lg:gap-8">
             <div className="flex flex-col items-center cursor-pointer">
               <img
-                src="/src/assets/svg/cart-svgrepo-com.svg"
+                src="/assets/svg/cart-svgrepo-com.svg"
                 alt="Cart"
                 className="w-5 h-5"
               />
@@ -93,7 +93,7 @@ const Header = (props) => {
 
             <div className="flex flex-col items-center cursor-pointer">
               <img
-                src="/src/assets/svg/heart-svgrepo-com.svg"
+                src="/assets/svg/heart-svgrepo-com.svg"
                 alt="Heart"
                 className="w-5 h-5"
               />
@@ -110,7 +110,7 @@ const Header = (props) => {
               }}
             >
               <img
-                src="/src/assets/svg/profile-svgrepo-com.svg"
+                src="/assets/svg/profile-svgrepo-com.svg"
                 alt="Heart"
                 className="w-5 h-5"
               />
@@ -124,7 +124,7 @@ const Header = (props) => {
           <div className="flex md:hidden items-center gap-4">
             <div className="flex flex-col items-center cursor-pointer">
               <img
-                src="/src/assets/svg/cart-svgrepo-com.svg"
+                src="/assets/svg/cart-svgrepo-com.svg"
                 alt="Cart"
                 className="w-5 h-5"
               />
@@ -166,7 +166,7 @@ const Header = (props) => {
                   }}
                 >
                   <img
-                    src="/src/assets/svg/profile-svgrepo-com.svg"
+                    src="/public/assets/svg/cart-svgrepo-com.svg"
                     alt="Profile"
                     className="w-5 h-5"
                   />
@@ -176,7 +176,7 @@ const Header = (props) => {
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 cursor-pointer">
                   <img
-                    src="/src/assets/svg/heart-svgrepo-com.svg"
+                    src="/assets/svg/heart-svgrepo-com.svg"
                     alt="Favorites"
                     className="w-5 h-5"
                   />

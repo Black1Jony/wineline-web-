@@ -28,14 +28,14 @@ const MainPage = () => {
           <div className="hidden xl:flex flex-col gap-6">
             <Promotion
               promotion={{
-                image: "/src/assets/logos/italia.png",
+                image: "/assets/logos/italia.png",
                 title: "La Italian Wine",
                 description: "Самые лучшие вина прямиком из Италии",
               }}
             />
             <Promotion
               promotion={{
-                image: "/src/assets/logos/French.png",
+                image: "/assets/logos/French.png",
                 title: "Franzua Wine",
                 description: "Франция — страна виноградников и виноделия",
               }}

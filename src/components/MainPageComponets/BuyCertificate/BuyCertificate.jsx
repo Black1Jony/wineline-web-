@@ -26,7 +26,7 @@ const BuyCertificate = () => {
 
       <div className="absolute right-[-80px] bottom-0 z-0">
         <img
-          src="/src/assets/logos/howto_card_july.png"
+          src="/assets/logos/howto_card_july.png"
           alt="Сертификат"
           className="w-[700px] h-[420px] object-contain"
         />

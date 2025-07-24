@@ -12,7 +12,7 @@ const OurPlus = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           <div className="bg-[#28282a] flex flex-col justify-end relative shadow-xl rounded-2xl text-center text-white min-h-[460px] overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-2xl duration-300">
             <img
-              src="/src/assets/info/info-item1-desktop.png"
+              src="/assets/info/info-item1-desktop.png"
               alt="Каталог"
               className="w-full h-auto object-cover"
             />
@@ -27,7 +27,7 @@ const OurPlus = () => {
 
           <div className="bg-[#28282a] flex flex-col justify-end relative shadow-xl rounded-2xl text-center text-white min-h-[460px] overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-2xl duration-300">
             <img
-              src="/src/assets/info/info-item2-desktop.png"
+              src="/assets/info/info-item2-desktop.png"
               alt="Поиск"
               className="w-full h-auto object-cover"
             />
@@ -42,7 +42,7 @@ const OurPlus = () => {
 
           <div className="bg-[#28282a] flex flex-col justify-end relative shadow-xl rounded-2xl text-center text-white min-h-[460px] overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-2xl duration-300">
             <img
-              src="/src/assets/info/info-item3-desktop.png"
+              src="/assets/info/info-item3-desktop.png"
               alt="Бонусная система"
               className="w-full h-auto object-cover"
             />

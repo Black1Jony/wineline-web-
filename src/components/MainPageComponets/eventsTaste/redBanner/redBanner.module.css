@@ -1,6 +1,6 @@
 
 .redBanner {
-  background-image: url("/src/assets/svgLogos/red.svg");
+  background-image: url("/assets/svgLogos/red.svg");
   background-size: cover; /* или contain, в зависимости от нужного эффекта */
   background-repeat: no-repeat;
   background-position: center;
