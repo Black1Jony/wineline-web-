@@ -1,0 +1,41 @@
+
+.redBanner {
+  background-image: url("/src/assets/svgLogos/red.svg");
+  background-size: cover; /* или contain, в зависимости от нужного эффекта */
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  position: relative; /* для абсолютного позиционирования дочерних элементов */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+}
+
+.bannerImage {
+  position: relative; 
+  width: auto;
+  height: 80%; 
+  max-width: 90%;
+  object-fit: contain;
+
+  left: 43%;
+}
+
+@media screen and (max-width: 1024px) {
+  .bannerImage{
+    left: 30%;
+  }
+}
+@media screen and (max-width: 730px) {
+  .bannerImage{
+    left: 16%;
+  }
+}
+@media screen and (max-width: 530px) {
+  .bannerImage{
+    left: 6%;
+  }
+}

@@ -59,3 +59,4 @@ export const registerWithEmail = async (
     return "errorData";
   }
 };
+

@@ -1,0 +1,44 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Jersey+25&family=Karla:ital,wght@0,200..800;1,200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.DM{
+   font-family: "Montserrat", sans-serif;
+    transform: scaleY(1.1);
+}
+.redline{
+ 
+  border-bottom: 2px solid red;
+  padding-bottom: 2px;
+
+}
+/* Стили для кнопок навигации */
+.swiper-button-prev-custom,
+.swiper-button-next-custom {
+  width: 40px;
+  height: 40px;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  color: #333;
+  opacity: 1 !important; /* Всегда видимые, но серые */
+  transition: all 0.3s ease;
+}
+
+/* Активные кнопки (когда можно двигаться) */
+.swiper-button-prev:not(.swiper-button-disabled),
+.swiper-button-next:not(.swiper-button-disabled) {
+  background-color: #e0e0e0;
+  color: #000;
+  cursor: pointer;
+}
+
+/* Неактивные кнопки (серые) */
+.swiper-button-disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed;
+}
+
+/* Убираем стандартные стили Swiper */
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 18px;
+}

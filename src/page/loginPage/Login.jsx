@@ -1,16 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./logincss.css";
 import { useNavigate } from "react-router-dom";
 import {
   registerWithEmail,
   loginWithEmail,
 } from "../../utils/firebase/auth/loginAuth";
-
+import {
+  signInWithGoogle,
+  signInWithGitHub,
+} from "../../utils/firebase/auth/signWithprovider";
+import { FaGithub } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
+import { message } from "antd";
 export default function LoginPage() {
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  // Общие состояния для обеих форм
+  const [messageApi, contextHolder] = message.useMessage()
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -18,10 +25,13 @@ export default function LoginPage() {
   const token = localStorage.getItem("token");
   
   const navigate = useNavigate();
-if (token) {
+useEffect(() => {
+  if (token) {
     navigate("/");
-    return null; 
-}
+   
+  }
+  
+}, []);
   const toggleForm = () => {
     setIsLoginForm(!isLoginForm);
     setError("");
@@ -42,6 +52,8 @@ if (token) {
       }
     } catch (err) {
       setError("Ошибка при входе");
+      console.log(err);
+      
     } finally {
       setLoading(false);
     }
@@ -73,158 +85,206 @@ if (token) {
       }
     } catch (err) {
       setError("Ошибка при регистрации");
+      console.log(err);
     } finally {
       setLoading(false);
     }
   };
-
+  const messageAlreadyHAveAccount = ()=>{
+    messageApi.open(
+    {
+      type: 'error',
+      content: 'Уже есть аккаунт',
+    }
+    )
+  }
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-side gradient-bg">
-          <h2>Добро пожаловать!</h2>
-          <p>Войдите или зарегистрируйтесь для доступа к сервису.</p>
-          <div className="social-buttons">
-            <button className="social-btn google">
-              <i className="fab fa-google"></i> Google
-            </button>
-            <button className="social-btn facebook">
-              <i className="fab fa-facebook-f"></i> Facebook
-            </button>
-          </div>
-        </div>
+    <>
+      {contextHolder}
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-side gradient-bg">
+            <h2>Добро пожаловать!</h2>
+            <p>Войдите или зарегистрируйтесь для доступа к сервису.</p>
+            <div className="social-buttons">
+              <FaGoogle 
+               className="w-12 h-12"
+                onClick={async () => {
+                  const result = await signInWithGoogle();
 
-        <div className="auth-form-container justify-center items-center">
-          <div className={`form-toggle ${isLoginForm ? "" : "flipped"}`}>
-            {/* Форма входа */}
-            <div className="form-front mt-13">
-              <h2>Вход в аккаунт</h2>
-              {error && <div className="error-message">{error}</div>}
+                  if (result.success) {
+                    localStorage.setItem("token", result.token);
+                    navigate("/");
+                  } else if (
+                    result.error?.code ===
+                    "auth/account-exists-with-different-credential"
+                  ) {
+                    setError(
+                      "Учетная запись уже существует с другим способом входа"
+                    );
+                  } else {
+                    setError("Ошибка входа через Google");
+                  }
+                }}
+              />
+              <FaGithub
+                className="w-12 h-12"
+                onClick={async () => {
+                  const result = await signInWithGitHub();
 
-              <form className="auth-form" onSubmit={handleLogin}>
-                <div className="input-group">
-                  <i className="fas fa-envelope"></i>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-
-                <div className="input-group">
-                  <i className="fas fa-lock"></i>
-                  <input
-                    type="password"
-                    placeholder="Пароль"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-options">
-                  <label>
-                    <input type="checkbox" /> Запомнить меня
-                  </label>
-                </div>
-
-                <button type="submit" className="btn-submit" disabled={loading}>
-                  {loading ? "Загрузка..." : "Войти"}
-                </button>
-
-                <p className="form-switch">
-                  Нет аккаунта?{" "}
-                  <button
-                    type="button"
-                    onClick={toggleForm}
-                    className="text-link"
-                  >
-                    Зарегистрироваться
-                  </button>
-                </p>
-              </form>
+                  if (result.success) {
+                    localStorage.setItem("token", result.token);
+                    navigate("/");
+                  } else if (result.conflict) {
+                    setError(
+                      "Учетная запись уже существует с другим способом входа"
+                    );
+                  } else {
+                    setError("Ошибка входа через GitHub");
+                  }
+                }}
+              />
             </div>
+          </div>
 
-            {/* Форма регистрации */}
-            <div className="form-back">
-              <h2>Создать аккаунт</h2>
-              {error && <div className="error-message">{error}</div>}
+          <div className="auth-form-container justify-center items-center">
+            <div className={`form-toggle ${isLoginForm ? "" : "flipped"}`}>
+              <div className="form-front mt-13">
+                <h2>Вход в аккаунт</h2>
+                {error && <div className="error-message">{error}</div>}
 
-              <form className="auth-form" onSubmit={handleRegister}>
-                <div className="input-group">
-                  <i className="fas fa-user"></i>
-                  <input
-                    type="text"
-                    placeholder="Имя"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
+                <form className="auth-form" onSubmit={handleLogin}>
+                  <div className="input-group">
+                    <i className="fas fa-envelope"></i>
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
 
-                <div className="input-group">
-                  <i className="fas fa-envelope"></i>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+                  <div className="input-group">
+                    <i className="fas fa-lock"></i>
+                    <input
+                      type="password"
+                      placeholder="Пароль"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
 
-                <div className="input-group">
-                  <i className="fas fa-lock"></i>
-                  <input
-                    type="password"
-                    placeholder="Пароль"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    minLength={6}
-                  />
-                </div>
+                  <div className="form-options">
+                    <label>
+                      <input type="checkbox" /> Запомнить меня
+                    </label>
+                  </div>
 
-                <div className="input-group">
-                  <i className="fas fa-lock"></i>
-                  <input
-                    type="password"
-                    placeholder="Повторите пароль"
-                    required
-                    value={repeatPassword}
-                    onChange={(e) => setRepeatPassword(e.target.value)}
-                    minLength={6}
-                  />
-                </div>
-
-                <label className="terms-checkbox">
-                  <input type="checkbox" required />Я согласен с{" "}
-                  <button type="button" className="text-link">
-                    условиями
-                  </button>
-                </label>
-
-                <button type="submit" className="btn-submit" disabled={loading}>
-                  {loading ? "Загрузка..." : "Зарегистрироваться"}
-                </button>
-
-                <p className="form-switch">
-                  Уже есть аккаунт?{" "}
                   <button
-                    type="button"
-                    onClick={toggleForm}
-                    className="text-link"
+                    type="submit"
+                    className="btn-submit"
+                    disabled={loading}
                   >
-                    Войти
+                    {loading ? "Загрузка..." : "Войти"}
                   </button>
-                </p>
-              </form>
+
+                  <p className="form-switch">
+                    Нет аккаунта?{" "}
+                    <button
+                      type="button"
+                      onClick={toggleForm}
+                      className="text-link"
+                    >
+                      Зарегистрироваться
+                    </button>
+                  </p>
+                </form>
+              </div>
+
+              <div className="form-back">
+                <h2>Создать аккаунт</h2>
+                {error && <div className="error-message">{error}</div>}
+
+                <form className="auth-form" onSubmit={handleRegister}>
+                  <div className="input-group">
+                    <i className="fas fa-user"></i>
+                    <input
+                      type="text"
+                      placeholder="Имя"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <i className="fas fa-envelope"></i>
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <i className="fas fa-lock"></i>
+                    <input
+                      type="password"
+                      placeholder="Пароль"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      minLength={6}
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <i className="fas fa-lock"></i>
+                    <input
+                      type="password"
+                      placeholder="Повторите пароль"
+                      required
+                      value={repeatPassword}
+                      onChange={(e) => setRepeatPassword(e.target.value)}
+                      minLength={6}
+                    />
+                  </div>
+
+                  <label className="terms-checkbox">
+                    <input type="checkbox" required />Я согласен с{" "}
+                    <button type="button" className="text-link">
+                      условиями
+                    </button>
+                  </label>
+
+                  <button
+                    type="submit"
+                    className="btn-submit"
+                    disabled={loading}
+                  >
+                    {loading ? "Загрузка..." : "Зарегистрироваться"}
+                  </button>
+
+                  <p className="form-switch">
+                    Уже есть аккаунт?{" "}
+                    <button
+                      type="button"
+                      onClick={toggleForm}
+                      className="text-link"
+                    >
+                      Войти
+                    </button>
+                  </p>
+                </form>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

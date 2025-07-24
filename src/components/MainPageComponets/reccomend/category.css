@@ -3,3 +3,12 @@
     font-weight: 500;
     font-size: 20px;
 }
+
+.hide-scrollbar {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;     
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; 
+}

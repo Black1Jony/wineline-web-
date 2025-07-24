@@ -34,3 +34,16 @@
     transform: translateY(0);
   }
 }
+.slide-up {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.slide-down {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.placeholder-text {
+  color: #999;
+}

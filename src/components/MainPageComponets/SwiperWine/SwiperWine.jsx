@@ -4,7 +4,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-cards";
 import { Navigation, Pagination } from "swiper/modules";
-import './SwiperWine.css'
+import './swiperWine.css'
 const SwiperWine = () => {
   return <>
 <Swiper
@@ -19,7 +19,7 @@ const SwiperWine = () => {
       delay: 8000,
       disableOnInteraction: false,
     }}
-    className="w-[65%] h-[300px] hidden md:block rounded-2xl sm:h-[325px] ] lg:h-[325px]  xl:h-[470px]  2xl:h-[560px]"
+    className="w-[100%] h-[300px] hidden md:block rounded-2xl sm:h-[325px] ] lg:h-[365px]  xl:h-[470px]  2xl:h-[560px]"
     >
     <SwiperSlide>
       <img src="/src/assets/logos/3e462aa549a63fc26e940e2caeb675cc.webp" alt="Wine 1" className="w-full h-full rounded-2xl object-center" />
