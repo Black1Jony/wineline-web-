@@ -16,6 +16,8 @@ const LazyProduct = lazy(() =>
 import OurPlus from "../../../components/MainPageComponets/OurPlus/OurPlus.jsx";
 import BuyCertificate from "../../../components/MainPageComponets/BuyCertificate/BuyCertificate.jsx";
 import OurBrends from "../../../components/MainPageComponets/OurBrends/OurBrends.jsx";
+import OurPlusTwo from "../../../components/MainPageComponets/OurPlus/OurPlusTwo.jsx";
+import Footer from "../../../components/Footer/Footer.jsx";
 const MainPage = () => {
   return (
     <>
@@ -61,6 +63,8 @@ const MainPage = () => {
         </Suspense>
         <BuyCertificate/>
         <OurBrends/>
+        <OurPlusTwo/>
+        <Footer/>
       </div>
       <FloatButton.BackTop />
     </>

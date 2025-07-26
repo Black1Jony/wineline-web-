@@ -19,7 +19,6 @@ const Products = ({ items, first }) => {
     const fetchData = async () => {
       try {
         const results = await items();
-        console.log(results);
 
         setProducts(results);
       } catch (error) {
@@ -29,7 +28,7 @@ const Products = ({ items, first }) => {
       }
     };
     fetchData();
-  }, []);
+  }, [items]);
 
   useEffect(() => {
     if (swiperRef.current) {

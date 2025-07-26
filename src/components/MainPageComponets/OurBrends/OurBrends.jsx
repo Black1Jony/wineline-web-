@@ -1,6 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Grid, Pagination, Navigation } from "swiper/modules";
-
 import "swiper/css";
 import "swiper/css/grid";
 import "swiper/css/pagination";
@@ -23,16 +22,17 @@ const OurBrends = () => {
         <h1 className="text-2xl font-semibold mb-4">Наши бренды</h1>
         <Swiper
           spaceBetween={20}
-          slidesPerView={9}
-          modules={[Grid, Pagination, Navigation]}
+          slidesPerView={3}
+          slidesPerGroup={8}
           grid={{ rows: 3, fill: "row" }}
+          modules={[Grid, Pagination, Navigation]}
           pagination={{ clickable: true }}
           navigation={true}
-          slidesPerGroup={9}
           loop={true}
           breakpoints={{
             768: {
-              slidesPerView: 3,
+              slidesPerView: 9,
+              slidesPerGroup: 9,
               grid: {
                 rows: 1,
                 fill: "row",

@@ -16,7 +16,7 @@ const Header = (props) => {
     { name: "Коньяк", path: "/catalog/konyak" },
     { name: "бокалы", path: "/catalog/glasses" },
     { name: "джин", path: "/catalog/gin" },
-    { name: "аксессуары", path: "/catalog/accessories" },
+    { name: "Води и соки", path: "/catalog/voda" },
     { name: "дегустации", path: "/tastings" },
     { name: "акции%", path: "/promotions" },
   ];
@@ -100,7 +100,7 @@ const Header = (props) => {
               <span className="text-xs text-[#2d2d2d]">избранное</span>
             </div>
             <div
-              className="flex flex-col items-center cursor-pointer"
+              className="hidden flex-col items-center cursor-pointer md:flex"
               onClick={() => {
                 if (!localStorage.getItem("token")) {
                   navigate("/login");
@@ -122,7 +122,7 @@ const Header = (props) => {
 
          
           <div className="flex md:hidden items-center gap-4">
-            <div className="flex flex-col items-center cursor-pointer">
+            <div className="hidden flex-col items-center cursor-pointer md:flex">
               <img
                 src="/assets/svg/cart-svgrepo-com.svg"
                 alt="Cart"

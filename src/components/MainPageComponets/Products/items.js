@@ -14,7 +14,6 @@ export const firstitems = async () => {
   const alcohol = await raiting(
     "http://localhost:3000/all?sortBy=alcohol&limit=25"
   );
-  console.log(alcohol);
   
   const promotion = await raiting(
     "http://localhost:3000/all?sortBy=promotion&limit=25"
