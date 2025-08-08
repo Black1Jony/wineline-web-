@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-
 import s from "./product.module.css";
 import Card from "../../cards/card";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -39,6 +38,7 @@ const Products = ({ items, first }) => {
       }, 100);
     }
   }, [nowCard]);
+
 
   if (loading) {
     return <div className="text-center mt-10 text-lg">Загрузка...</div>;
@@ -101,7 +101,7 @@ const Products = ({ items, first }) => {
           swiperRef.current = swiper;
         }}
       >
-        {products[nowCard]?.value.map((i) => (
+        {products[nowCard]?.value?.map((i) => (
           <SwiperSlide key={i.id}>
             <Card data={i} />
           </SwiperSlide>

@@ -4,17 +4,19 @@ import { HeartOutlined, HeartFilled } from "@ant-design/icons";
 import s from "./card.module.css";
 import { useNavigate } from "react-router-dom";
 import { getinfo } from "./cardgetData";
+import { useCountStore } from "../../utils/store/countTovarsstore";
 const Card = ({ data }) => {
+  const { decrement } = useCountStore();
   const [isLiked, setIsLiked] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const token = localStorage.getItem('token')
-  const navigate = useNavigate()
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
   const toggleLike = () => {
     if (!token) {
-       messageApi.open({
-         type: "warning",
-         content: 'вы должны зарегистрироватся',
-       });
+      messageApi.open({
+        type: "warning",
+        content: "вы должны зарегистрироватся",
+      });
     } else {
       setIsLiked(!isLiked);
       messageApi.open({
@@ -25,10 +27,10 @@ const Card = ({ data }) => {
   };
 
   const article = data.article?.replace(/\D/g, "");
-  const image = data.images?.[0];
+  const image = data?.images[0];
   const hasSale = data.price?.sale;
-  const price = data.price?.current;
-
+  const price = data.price?.meta + " ₽";
+  const [hiddenCard, setHiddenCard] = useState(false)
   const getoldPrice = () => {
     if (hasSale) {
       const str = hasSale.match(/\d+/)[0];
@@ -46,11 +48,11 @@ const Card = ({ data }) => {
       content: "Артикуль скопирован",
     });
   };
-
+ 
   return (
     <>
       {contextHolder}
-      {data.images.length !== 0 && (
+      {!hiddenCard && image && (
         <div
           className={`relative w-full h-[480px] flex flex-col text-center border border-[#c3c3c3] p-2 bg-white ${s.arial} md:border-[0px]`}
         >
@@ -89,6 +91,12 @@ const Card = ({ data }) => {
               src={image}
               alt={data.fullName}
               className="w-full max-h-[190px] object-contain mb-2"
+              onError={() => {
+                decrement();
+                setHiddenCard(true)
+                
+                
+              }}
             />
 
             <div

@@ -1,0 +1,16 @@
+.fontFamilic{
+font-family: Georgia, "Times New Roman", serif;
+}
+.responsiveBanner {
+  display: flex;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right;
+  min-height: 540px;
+}
+
+@media (max-width: 768px) {
+  .responsiveBanner {
+    display: none;
+  }
+}
