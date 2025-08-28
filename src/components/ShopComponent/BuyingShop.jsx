@@ -4,17 +4,16 @@ import { shopStore } from "../../utils/store/shopStore";
 import { Modal, Input, Button, message as antdMessage } from "antd";
 import Cards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
-import MapModal from "../Map/Map";
 
-const BuyingShop = ({ price, count, refProp, productsRef }) => {
+const BuyingShop = ({ price, count, refProp, productsRef, userId }) => {
   const deleteAll = shopStore((state) => state.clearProducts);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [geoOpen, setGeoOpen] = useState(false);
-  const [geo, setGeo] = useState(
-    JSON.parse(localStorage.getItem("userGeoposition")) || null
-  );
   const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [discount, setDiscount] = useState(0);
+  const [amount, setAmount] = useState(price);
+
   const [cardData, setCardData] = useState({
     number: "",
     name: "",
@@ -22,27 +21,26 @@ const BuyingShop = ({ price, count, refProp, productsRef }) => {
     cvc: "",
     focus: "",
   });
-  const [amount, setAmount] = useState(price);
 
   const [messageApi, contextHolder] = antdMessage.useMessage();
 
+  // -------------------- Работа с картой --------------------
   const handleInputChange = (e) => {
     let { name, value } = e.target;
-
     if (name === "number") {
-      value = value.replace(/\D/g, "").slice(0, 16);
-      value = value.replace(/(.{4})/g, "$1 ").trim();
+      value = value
+        .replace(/\D/g, "")
+        .slice(0, 16)
+        .replace(/(.{4})/g, "$1 ")
+        .trim();
     }
-
     if (name === "expiry") {
       value = value.replace(/\D/g, "").slice(0, 4);
       if (value.length >= 3) value = value.slice(0, 2) + "/" + value.slice(2);
     }
-
     if (name === "cvc") {
       value = value.replace(/\D/g, "").slice(0, 4);
     }
-
     setCardData({ ...cardData, [name]: value });
   };
 
@@ -51,17 +49,14 @@ const BuyingShop = ({ price, count, refProp, productsRef }) => {
 
   const validateCard = () => {
     const { number, name, expiry, cvc } = cardData;
-
     if (!/^\d{4} \d{4} \d{4} \d{4}$/.test(number)) {
       messageApi.warning("Введите корректный номер карты (16 цифр)!");
       return false;
     }
-
     if (!name.trim()) {
       messageApi.warning("Введите имя владельца карты!");
       return false;
     }
-
     if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
       messageApi.warning("Введите корректный срок действия (MM/YY)!");
       return false;
@@ -74,61 +69,85 @@ const BuyingShop = ({ price, count, refProp, productsRef }) => {
         return false;
       }
     }
-
     if (!/^\d{3,4}$/.test(cvc)) {
       messageApi.warning("Введите корректный CVC (3-4 цифры)!");
       return false;
     }
-
     return true;
   };
 
-  const handleBuy = async () => {
-    const userId = localStorage.getItem("user");
-    if (!userId) {
-      messageApi.error("Пожалуйста, авторизуйтесь!");
+  // -------------------- Применение промокода --------------------
+  const applyPromoCode = async () => {
+    if (!promoCode.trim()) {
+      messageApi.warning("Введите промокод");
       return;
     }
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/apply/${localStorage.getItem("user")}`,
+        {
+          code: promoCode.trim(),
+        }
+      );
 
+      setAppliedPromo(response.data);
+      setDiscount(response.data.amount);
+      setAmount(price - response.data.amount);
+      messageApi.success(
+        `Промокод "${promoCode}" применён! Скидка: ${response.data.amount} ₽`
+      );
+    } catch (err) {
+      messageApi.error(
+        err.response?.data?.error || "Ошибка при применении промокода"
+      );
+    }
+  };
+
+  // -------------------- Оплата --------------------
+  const handleBuy = async () => {
     if (!validateCard()) return;
 
-    try {
-      const code = promoCode || `SHOP-${Date.now()}`;
+    const codeToSend = appliedPromo ? appliedPromo.code : `SHOP-${Date.now()}`;
 
+    try {
       const response = await axios.post("http://localhost:3000/card", {
-        code,
+        code: codeToSend,
         amount,
         infinite: false,
-        userId,
+        userId: localStorage.getItem("user"),
       });
 
       messageApi.success(
         `Покупка успешно оформлена! Код: ${response.data.code}`
       );
 
-      // очистка корзины + localStorage
-      deleteAll();
-      localStorage.removeItem("shop-storage");
+      // Убираем товары с задержкой 3 секунды
+      setTimeout(() => {
+        deleteAll();
+        localStorage.removeItem("shop-storage");
+      }, 3000);
 
-      // сброс данных
+      // Сброс полей
       setModalOpen(false);
       setCardData({ number: "", name: "", expiry: "", cvc: "", focus: "" });
       setPromoCode("");
+      setAppliedPromo(null);
+      setDiscount(0);
+      setAmount(price);
     } catch (err) {
-      console.error(err.response?.data || err.message);
       messageApi.error(
         "Ошибка при оформлении: " + (err.response?.data?.error || err.message)
       );
     }
   };
 
+  // -------------------- Sticky корзина --------------------
   useEffect(() => {
     const payment = refProp.current;
     const products = productsRef.current;
     if (!payment || !products) return;
 
     const topOffset = 20;
-
     const onScroll = () => {
       const productsRect = products.getBoundingClientRect();
       const paymentHeight = payment.offsetHeight;
@@ -173,16 +192,15 @@ const BuyingShop = ({ price, count, refProp, productsRef }) => {
       {contextHolder}
       <div
         ref={refProp}
-        className="w-full flex flex-col gap-3 bg-white h-[400px] rounded-2xl p-4 sticky top-5"
+        className="w-full flex flex-col gap-3 bg-white h-[450px] rounded-2xl p-4 sticky top-5"
       >
         <div
           className="text-2xl font-Arial !font-semibold text-[#c2c2c2] cursor-pointer"
-          onClick={async () => {
-            deleteAll();
-            localStorage.removeItem("shop-storage");
-            await axios.delete(
-              `http://localhost:3000/shop/${localStorage.getItem("user")}`
-            );
+          onClick={() => {
+            setTimeout(() => {
+              deleteAll();
+              localStorage.removeItem("shop-storage");
+            }, 3000);
           }}
         >
           Очистить корзину
@@ -198,7 +216,7 @@ const BuyingShop = ({ price, count, refProp, productsRef }) => {
           />
           <Button
             className="w-1/2 bg-[#cfcfcf] text-white rounded-xl"
-            onClick={() => messageApi.info("Промокод применён!")}
+            onClick={applyPromoCode}
           >
             Применить
           </Button>
@@ -211,13 +229,19 @@ const BuyingShop = ({ price, count, refProp, productsRef }) => {
           </div>
           <div className="flex justify-between w-full">
             <h1 className="text-xl">Сумма</h1>
-            <h3 className="text-[16px]">{price}</h3>
+            <h3 className="text-[16px]">{price} ₽</h3>
           </div>
+          {discount > 0 && (
+            <div className="flex justify-between w-full text-green-600">
+              <h1 className="text-xl">Скидка</h1>
+              <h3 className="text-[16px]">-{discount} ₽</h3>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between">
           <h1 className="text-3xl font-arial !font-semibold">Итого</h1>
-          <h1 className="text-3xl font-arial !font-semibold">{price} С</h1>
+          <h1 className="text-3xl font-arial !font-semibold">{amount} ₽</h1>
         </div>
 
         <Button
@@ -282,37 +306,15 @@ const BuyingShop = ({ price, count, refProp, productsRef }) => {
             />
           </div>
 
-          <div className="flex justify-between gap-2">
-            <Button
-              onClick={() => setGeoOpen(true)}
-              className="bg-blue-600 text-white rounded-xl"
-            >
-              Указать геопозицию
-            </Button>
-
-            <Button
-              type="primary"
-              onClick={handleBuy}
-              className="bg-green-600 text-white rounded-xl"
-            >
-              Оплатить
-            </Button>
-          </div>
-
-          {geo && (
-            <div className="mt-2 text-gray-700">
-              <b>Геопозиция:</b> {geo.address} ({geo.lat}, {geo.lon})
-            </div>
-          )}
+          <Button
+            type="primary"
+            onClick={handleBuy}
+            className="bg-green-600 text-white rounded-xl"
+          >
+            Оплатить
+          </Button>
         </div>
       </Modal>
-
-      {geoOpen && (
-        <MapModal
-          userId={localStorage.getItem("user")}
-          onClose={() => setGeoOpen(false)}
-        />
-      )}
     </>
   );
 };
