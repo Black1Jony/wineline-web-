@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { CloseOutlined } from "@ant-design/icons";
 import "./input.css";
-
+import { useNavigate } from "react-router-dom";
 const InputPlaceHolder = ({ mobile }) => {
   const [value, setValue] = useState("");
+  const navigate = useNavigate();
   const dynamicPlaceHolder = [
     "вино",
     "йегермейстер",
@@ -27,7 +28,19 @@ const InputPlaceHolder = ({ mobile }) => {
 
     return () => clearInterval(interval);
   }, []);
+   useEffect(() => {
+     const handleKeyDown = (e) => {
+       if (e.key === "Enter" && value) {
+         navigate(`/search/q=${value}`)
+       }
+     };
 
+     window.addEventListener("keydown", handleKeyDown);
+
+     return () => {
+       window.removeEventListener("keydown", handleKeyDown);
+     };
+   }, [navigate, value]);
   return (
     <div
       className={`w-full flex border-[#e5e5e5] border-[1px] ${
@@ -63,8 +76,16 @@ const InputPlaceHolder = ({ mobile }) => {
           />
         )}
       </div>
-      <div className="bg-black text-white flex justify-center items-center w-16 md:w-24 h-7 md:h-9 rounded-[10px] text-xs md:text-sm">
-        найти
+      <div
+        className="bg-black text-white flex justify-center items-center w-16 md:w-24 h-7 md:h-9 rounded-[10px] text-xs md:text-sm"
+        onClick={() => {
+          if (value) {
+            setValue("");
+            navigate(`/search/q=${value}`);
+          }
+        }}
+      >
+         найти
       </div>
     </div>
   );

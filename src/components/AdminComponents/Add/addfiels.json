@@ -1,0 +1,231 @@
+{
+  "Вино": [
+    {
+      "name": "Регион",
+      "type": "input",
+      "placeholder": "Введите Регион"
+    },
+    {
+      "name": "Аппелласьон",
+      "type": "input",
+      "placeholder": "Введите Аппелласьон"
+    },
+    {
+      "name": "Категория",
+      "type": "input",
+      "placeholder": "Введите Категорию"
+    },
+    {
+      "name": "Выдержка в емкости",
+      "type": "select",
+      "placeholder": "Выберите Выдержку",
+      "options": ["Нейтральная Ёмкость", "В Бочке"]
+    },
+    {
+      "name": "Год",
+      "type": "inputNumber",
+      "placeholder": "Введите Год"
+    },
+    {
+      "name": "Потенциал хранения",
+      "type": "input",
+      "placeholder": "Введите Потенциал хранения"
+    },
+    {
+      "name": "Температура подачи",
+      "type": "input",
+      "placeholder": "Введите Температуру подачи"
+    },
+    {
+      "name": "Вино",
+      "type": "select",
+      "placeholder": "Выберите Вино",
+      "options": ["красное", "белое", "розовое"]
+    },
+    {
+      "name": "Страна, регион",
+      "type": "input",
+      "placeholder": "Введите Страна, регион"
+    },
+    {
+      "name": "Сахар",
+      "type": "select",
+      "placeholder": "Выберите Сахар",
+      "options": ["сухое", "полусухое", "полусладкое", "сладкое", "брют"]
+    },
+    {
+      "name": "Виноград",
+      "type": "input",
+      "placeholder": "Введите Виноград"
+    },
+    {
+      "name": "Производитель",
+      "type": "input",
+      "placeholder": "Введите Производитель"
+    },
+    {
+      "name": "Крепость",
+      "type": "input",
+      "placeholder": "Введите Крепость"
+    },
+    {
+      "name": "Объем",
+      "type": "input",
+      "placeholder": "Введите Объем"
+    }
+  ],
+
+  "шампанское": [
+    {
+      "name": "Регион",
+      "type": "input",
+      "placeholder": "Введите Регион"
+    },
+    {
+      "name": "Аппелласьон",
+      "type": "input",
+      "placeholder": "Введите Аппелласьон"
+    },
+    {
+      "name": "Категория",
+      "type": "input",
+      "placeholder": "Введите Категорию"
+    },
+    {
+      "name": "Выдержка в емкости",
+      "type": "select",
+      "placeholder": "Выберите Выдержку",
+      "options": ["Нейтральная Ёмкость", "В Бочке"]
+    },
+    {
+      "name": "Потенциал хранения",
+      "type": "input",
+      "placeholder": "Введите Потенциал хранения"
+    },
+    {
+      "name": "Температура подачи",
+      "type": "input",
+      "placeholder": "Введите Температуру подачи"
+    },
+    {
+      "name": "Вино",
+      "type": "select",
+      "placeholder": "Выберите Вино",
+      "options": ["белое", "розовое"]
+    },
+    {
+      "name": "Страна, регион",
+      "type": "input",
+      "placeholder": "Введите Страна, регион"
+    },
+    {
+      "name": "Сахар",
+      "type": "select",
+      "placeholder": "Выберите Сахар",
+      "options": ["брют", "экстра брют", "сухое", "полусухое", "сладкое"]
+    },
+    {
+      "name": "Виноград",
+      "type": "input",
+      "placeholder": "Введите Виноград"
+    },
+    {
+      "name": "Производитель",
+      "type": "input",
+      "placeholder": "Введите Производитель"
+    },
+    {
+      "name": "Крепость",
+      "type": "input",
+      "placeholder": "Введите Крепость"
+    },
+    {
+      "name": "Объем",
+      "type": "input",
+      "placeholder": "Введите Объем"
+    }
+  ],
+
+  "Коньяк": [
+    {
+      "name": "Температура подачи",
+      "type": "input",
+      "placeholder": "Введите Температуру подачи"
+    },
+    {
+      "name": "Страна, регион",
+      "type": "input",
+      "placeholder": "Введите Страна, регион"
+    },
+    {
+      "name": "Аппелласьон",
+      "type": "input",
+      "placeholder": "Введите Аппелласьон"
+    },
+    {
+      "name": "Бренд",
+      "type": "input",
+      "placeholder": "Введите Бренд"
+    },
+    {
+      "name": "Класс",
+      "type": "select",
+      "placeholder": "Выберите Класс",
+      "options": ["VS", "VSOP", "XO", "Extra"]
+    },
+    {
+      "name": "Виноград",
+      "type": "input",
+      "placeholder": "Введите Виноград"
+    },
+    {
+      "name": "Объем",
+      "type": "input",
+      "placeholder": "Введите Объем"
+    },
+    {
+      "name": "Крепость",
+      "type": "input",
+      "placeholder": "Введите Крепость"
+    }
+  ],
+
+  "Виски": [
+    {
+      "name": "Температура подачи",
+      "type": "input",
+      "placeholder": "Введите Температуру подачи"
+    },
+    {
+      "name": "Страна, регион",
+      "type": "input",
+      "placeholder": "Введите Страна, регион"
+    },
+    {
+      "name": "Крепость",
+      "type": "input",
+      "placeholder": "Введите Крепость"
+    },
+    {
+      "name": "Объем",
+      "type": "input",
+      "placeholder": "Введите Объем"
+    },
+    {
+      "name": "Тип",
+      "type": "select",
+      "placeholder": "Выберите Тип",
+      "options": ["Односолодовый", "Купажированный", "Бленд"]
+    },
+    {
+      "name": "Срок выдержки",
+      "type": "input",
+      "placeholder": "Введите Срок выдержки"
+    },
+    {
+      "name": "Бренд",
+      "type": "input",
+      "placeholder": "Введите Бренд"
+    }
+  ]
+}

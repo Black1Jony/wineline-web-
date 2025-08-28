@@ -1,213 +1,221 @@
-import { useFilterStore } from "../../../utils/store/filterstore";
 import { useState, useEffect } from "react";
-import { Switch, Collapse, Input, Radio, Row, Col, Checkbox } from "antd";
+import {
+  Drawer,
+  Button,
+  InputNumber,
+  Collapse,
+  Radio,
+  Row,
+  Col,
+  Checkbox,
+  Switch,
+} from "antd";
+import { motion } from "framer-motion";
+import { useFilterStore } from "../../../utils/store/filterstore";
 import getFiltersFromServer from "./filters";
 
 const { Panel } = Collapse;
 
 const Filter = ({ type }) => {
   const { setType, setFilter, resetFilters } = useFilterStore();
-  const [nowfilter, setNowFilter] = useState([]);
+
+  const [nowFilter, setNowFilter] = useState([]);
   const [present, setPresent] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [selectedPrice, setSelectedPrice] = useState(null);
   const [range, setRange] = useState({ min: "", max: "" });
   const [selectedValues, setSelectedValues] = useState({});
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     setType(type);
     resetFilters();
     setPresent(false);
-    setSelected(null);
+    setSelectedPrice(null);
     setRange({ min: "", max: "" });
     setSelectedValues({});
-    const nowfilterset = async () => {
-      const filter = await getFiltersFromServer(type);
-      setNowFilter(filter);
-    };
-    nowfilterset();
-  }, [type, setType, resetFilters]);
 
-  const price = [
-    {
-      label: "до 1000 ₽",
-      value: "до1000",
-      infilter: () => {
-        setFilter("startPrice", 0);
-        setFilter("finishPrice", 1000);
-        setRange({ min: "0", max: "1000" });
-      },
-    },
-    {
-      label: "1 000–3 000 ₽",
-      value: "1000-3000",
-      infilter: () => {
-        setFilter("startPrice", 1000);
-        setFilter("finishPrice", 3000);
-        setRange({ min: "1000", max: "3000" });
-      },
-    },
-    {
-      label: "3 000–5 000 ₽",
-      value: "3000-5000",
-      infilter: () => {
-        setFilter("startPrice", 3000);
-        setFilter("finishPrice", 5000);
-        setRange({ min: "3000", max: "5000" });
-      },
-    },
-    {
-      label: "5 000–10 000 ₽",
-      value: "5000-10000",
-      infilter: () => {
-        setFilter("startPrice", 5000);
-        setFilter("finishPrice", 10000);
-        setRange({ min: "5000", max: "10000" });
-      },
-    },
-    {
-      label: "от 10 000 ₽",
-      value: "от10000",
-      infilter: () => {
-        setFilter("startPrice", 10000);
-        setFilter("finishPrice", null);
-        setRange({ min: "10000", max: "" });
-      },
-    },
+    const fetchFilters = async () => {
+      const filtersFromServer = await getFiltersFromServer(type);
+      setNowFilter(filtersFromServer);
+    };
+    fetchFilters();
+  }, [type]);
+
+  // Цены
+  const priceOptions = [
+    { label: "до 1000 ₽", min: 0, max: 1000 },
+    { label: "1 000–3 000 ₽", min: 1000, max: 3000 },
+    { label: "3 000–5 000 ₽", min: 3000, max: 5000 },
+    { label: "5 000–10 000 ₽", min: 5000, max: 10000 },
+    { label: "от 10 000 ₽", min: 10000, max: null },
   ];
 
-  const handleRangeChange = (key, value) => {
-    const sanitized = value.replace(/[^\d]/g, "");
+  const handlePriceRadio = (value) => {
+    const option = priceOptions.find((o) => o.label === value);
+    if (!option) return;
+    setRange({ min: option.min, max: option.max ?? "" });
+    setSelectedPrice(value);
+    setFilter("startPrice", option.min);
+    setFilter("finishPrice", option.max);
+  };
+
+  const handleRangeChange = (key, val) => {
+    const sanitized = val ? +val : null;
     setRange((prev) => ({ ...prev, [key]: sanitized }));
-    setSelected(null);
-
-    setFilter(
-      key === "min" ? "startPrice" : "finishPrice",
-      sanitized ? +sanitized : null
-    );
+    setSelectedPrice(null);
+    setFilter(key === "min" ? "startPrice" : "finishPrice", sanitized);
   };
 
-  const handleRadioChange = (e) => {
-    const value = e.target.value;
-    const option = price.find((opt) => opt.value === value);
-    if (option) {
-      option.infilter();
-      setSelected(value);
-    }
+  const handleCheckboxChange = (filterName, val) => {
+    setSelectedValues((prev) => ({ ...prev, [filterName]: val }));
+    setFilter(filterName, val);
   };
 
-  const handleSingleCheckboxChange = (filterName, value) => {
-    setSelectedValues((prev) => ({
-      ...prev,
-      [filterName]: value,
-    }));
-    setFilter(filterName, value);
+  // Анимация появления фильтров (опционально)
+  const motionVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <main className="w-full flex flex-col gap-4 p-4 sticky">
-      <div className="flex justify-between items-center rounded-3xl border border-gray-400 bg-white shadow-sm overflow-hidden">
-        <div className="flex gap-4 items-center pl-4 py-2">
-          <img
-            src="/public/assets/svg/decoration_present.svg"
-            alt="Present"
-            className="w-12 h-12"
-          />
-          <h4 className="text-base font-medium text-gray-700">
-            В подарочной упаковке
-          </h4>
-        </div>
-        <div className="flex items-center pr-4">
+    <>
+      {/* Desktop фильтры */}
+      <div className="hidden md:flex flex-col gap-4 p-4 sticky top-20">
+        <div className="flex justify-between items-center rounded-3xl border border-gray-400 bg-white shadow-sm overflow-hidden p-3">
+          <span>В подарочной упаковке</span>
           <Switch
-            className="w-12 h-8"
             checked={present}
-            onChange={(checked) => {
-              setPresent(checked);
-              setFilter("present", checked);
+            onChange={(v) => {
+              setPresent(v);
+              setFilter("present", v);
             }}
           />
         </div>
-      </div>
 
-      <Collapse
-        defaultActiveKey={["1"]}
-        ghost
-        expandIconPosition="end"
-        className="bg-white"
-      >
-        <Panel
-          header={
-            <span className="text-lg font-semibold text-gray-800">Цена</span>
-          }
-          key="1"
-          className="border-b border-gray-200"
-        >
-          <div className="flex gap-4 mb-4">
-            <Input
-              placeholder="от 540 ₽"
-              value={range.min}
-              onChange={(e) => handleRangeChange("min", e.target.value)}
-            />
-            <Input
-              placeholder="до 1 999 990 ₽"
-              value={range.max}
-              onChange={(e) => handleRangeChange("max", e.target.value)}
-            />
-          </div>
-
-          <Radio.Group
-            onChange={handleRadioChange}
-            value={selected}
-            className="w-full"
-          >
-            <div className="flex flex-col gap-2">
-              {price.map((option) => (
-                <Row key={option.value} justify="start" align="middle">
-                  <Col>
-                    <Radio value={option.value}>{option.label}</Radio>
-                  </Col>
-                </Row>
-              ))}
+        <Collapse ghost>
+          <Panel header="Цена" key="1">
+            <div className="flex gap-2 mb-4">
+              <InputNumber
+                placeholder="от"
+                value={range.min}
+                onChange={(v) => handleRangeChange("min", v)}
+              />
+              <InputNumber
+                placeholder="до"
+                value={range.max}
+                onChange={(v) => handleRangeChange("max", v)}
+              />
             </div>
-          </Radio.Group>
-        </Panel>
-      </Collapse>
-
-      {nowfilter.map((i, index) => (
-        <Collapse
-          ghost
-          key={index}
-          expandIconPosition="end"
-          className="bg-white"
-        >
-          <Panel
-            header={
-              <span className="text-lg font-semibold text-gray-800">
-                {i.label}
-              </span>
-            }
-            key={1}
-            className="border-b border-gray-200"
-          >
-            <Checkbox.Group
-              value={[selectedValues[i.name]] || []}
-              onChange={(vals) => {
-                const last = vals[vals.length - 1];
-                handleSingleCheckboxChange(i.name, last);
-              }}
-              className="w-full"
+            <Radio.Group
+              onChange={(e) => handlePriceRadio(e.target.value)}
+              value={selectedPrice}
             >
-              <div className="flex flex-col gap-2">
-                {i.option.map((option) => (
-                  <Checkbox key={option} value={option}>
-                    {option}
-                  </Checkbox>
-                ))}
-              </div>
-            </Checkbox.Group>
+              {priceOptions.map((opt) => (
+                <Radio key={opt.label} value={opt.label}>
+                  {opt.label}
+                </Radio>
+              ))}
+            </Radio.Group>
           </Panel>
         </Collapse>
-      ))}
-    </main>
+
+        {nowFilter.map((f, idx) => (
+          <Collapse ghost key={idx}>
+            <Panel header={f.label} key={idx}>
+              <Checkbox.Group
+                value={[selectedValues[f.name]] || []}
+                onChange={(vals) =>
+                  handleCheckboxChange(f.name, vals[vals.length - 1])
+                }
+              >
+                {f.option.map((o) => (
+                  <Checkbox key={o} value={o}>
+                    {o}
+                  </Checkbox>
+                ))}
+              </Checkbox.Group>
+            </Panel>
+          </Collapse>
+        ))}
+      </div>
+
+      {/* Мобильные фильтры через Drawer */}
+      <div className="md:hidden mb-4">
+        <Button type="primary" onClick={() => setDrawerOpen(true)}>
+          Фильтры
+        </Button>
+        <Drawer
+          title="Фильтры"
+          placement="left"
+          onClose={() => setDrawerOpen(false)}
+          open={drawerOpen}
+          width="80%"
+        >
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={motionVariants}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <span>В подарочной упаковке</span>
+              <Switch
+                checked={present}
+                onChange={(v) => {
+                  setPresent(v);
+                  setFilter("present", v);
+                }}
+              />
+            </div>
+
+            <Collapse ghost>
+              <Panel header="Цена" key="1">
+                <div className="flex gap-2 mb-4">
+                  <InputNumber
+                    placeholder="от"
+                    value={range.min}
+                    onChange={(v) => handleRangeChange("min", v)}
+                  />
+                  <InputNumber
+                    placeholder="до"
+                    value={range.max}
+                    onChange={(v) => handleRangeChange("max", v)}
+                  />
+                </div>
+                <Radio.Group
+                  onChange={(e) => handlePriceRadio(e.target.value)}
+                  value={selectedPrice}
+                >
+                  {priceOptions.map((opt) => (
+                    <Radio key={opt.label} value={opt.label}>
+                      {opt.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Panel>
+            </Collapse>
+
+            {nowFilter.map((f, idx) => (
+              <Collapse ghost key={idx}>
+                <Panel header={f.label} key={idx}>
+                  <Checkbox.Group
+                    value={[selectedValues[f.name]] || []}
+                    onChange={(vals) =>
+                      handleCheckboxChange(f.name, vals[vals.length - 1])
+                    }
+                  >
+                    {f.option.map((o) => (
+                      <Checkbox key={o} value={o}>
+                        {o}
+                      </Checkbox>
+                    ))}
+                  </Checkbox.Group>
+                </Panel>
+              </Collapse>
+            ))}
+          </motion.div>
+        </Drawer>
+      </div>
+    </>
   );
 };
 

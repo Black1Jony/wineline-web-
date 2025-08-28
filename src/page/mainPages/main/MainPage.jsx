@@ -33,6 +33,7 @@ const MainPage = () => {
                 image: "/assets/logos/italia.png",
                 title: "La Italian Wine",
                 description: "Самые лучшие вина прямиком из Италии",
+                country: "Италия",
               }}
             />
             <Promotion
@@ -40,10 +41,14 @@ const MainPage = () => {
                 image: "/assets/logos/French.png",
                 title: "Franzua Wine",
                 description: "Франция — страна виноградников и виноделия",
+                country: "Франция",
               }}
             />
-            <button className="w-full h-12 rounded-2xl bg-[#c4c3c3] text-sm">
-              Каталог товаров
+            <button
+              className="w-full h-12 rounded-2xl bg-[#c4c3c3] text-sm"
+              onClick={() => (window.location.pathname = "catalog/wine")}
+            >
+              Каталог Вина
             </button>
           </div>
         </div>
@@ -61,10 +66,10 @@ const MainPage = () => {
         <Suspense fallback={<div>...loadimg</div>}>
           <LazyProduct items={thirdItems} />
         </Suspense>
-        <BuyCertificate/>
-        <OurBrends/>
-        <OurPlusTwo/>
-        <Footer/>
+        <BuyCertificate />
+        <OurBrends />
+        <OurPlusTwo />
+        <Footer />
       </div>
       <FloatButton.BackTop />
     </>

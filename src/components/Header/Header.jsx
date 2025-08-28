@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import "./header.css";
 import { useNavigate } from "react-router-dom";
 import InputPlaceHolder from "../Input/InputPlaceHolder";
-
+import MapModal from "../Map/Map";
+import axios from "axios";
 const Header = (props) => {
   const navigate = useNavigate();
   const [isHidden, setIsHidden] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false)
   const ismenu = !props.ismenu || false;
   const tovars = [
     { name: "В подарочной", path: "/catalog/gift" },
@@ -14,13 +16,12 @@ const Header = (props) => {
     { name: "Шампанское и игристое", path: "/catalog/shampage" },
     { name: "Виски", path: "/catalog/whiskey" },
     { name: "Коньяк", path: "/catalog/konyak" },
-    { name: "бокалы", path: "/catalog/glasses" },
     { name: "джин", path: "/catalog/gin" },
     { name: "Води и соки", path: "/catalog/voda" },
-    { name: "дегустации", path: "/tastings" },
-    { name: "акции%", path: "/promotions" },
+    { name: "дегустации", path: "/event" },
   ];
-
+  
+  const [isMapOpen, setIsMapOpen] = useState(false);
   useEffect(() => {
     let lastScrollTop = 0;
 
@@ -40,10 +41,20 @@ const Header = (props) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
+  useEffect(() => {
+    const resp = async()=>{
+      const isAdminResponce = await axios.get(`http://localhost:3000/users/${localStorage.getItem('user')}`);
+      if (isAdminResponce.data.role === 'admin') {
+        setIsAdmin(true)
+      }
+    }
+    resp()
+  }, []);
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-
+  const user = localStorage.getItem("user");
   return (
     <div className="relative">
       <div
@@ -74,15 +85,32 @@ const Header = (props) => {
               src="/assets/svg/geo_icon_160074.svg"
               alt="Geo"
               className="w-5 h-5"
+              onClick={() => setIsMapOpen(true)}
             />
           </div>
 
           <div className="hidden md:flex flex-1 mx-4 max-w-xl">
             <InputPlaceHolder />
           </div>
+          {isAdmin && (
+            <div
+              className="flex flex-col items-center cursor-pointer"
+              onClick={() => navigate("/Admin")}
+            >
+              <img
+                src="/public/assets/icons/wine-fill-svgrepo-com.svg"
+                alt="Cart"
+                className="w-5 h-5"
+              />
+              <span className="text-xs text-[#2d2d2d]">Админка</span>
+            </div>
+          )}
 
           <div className="hidden md:flex items-center gap-4 lg:gap-8">
-            <div className="flex flex-col items-center cursor-pointer">
+            <div
+              className="flex flex-col items-center cursor-pointer"
+              onClick={() => navigate("/shop")}
+            >
               <img
                 src="/assets/svg/cart-svgrepo-com.svg"
                 alt="Cart"
@@ -91,7 +119,10 @@ const Header = (props) => {
               <span className="text-xs text-[#2d2d2d]">корзина</span>
             </div>
 
-            <div className="flex flex-col items-center cursor-pointer">
+            <div
+              className="flex flex-col items-center cursor-pointer "
+              onClick={() => navigate("/favorite")}
+            >
               <img
                 src="/assets/svg/heart-svgrepo-com.svg"
                 alt="Heart"
@@ -120,7 +151,6 @@ const Header = (props) => {
             </div>
           </div>
 
-         
           <div className="flex md:hidden items-center gap-4">
             <div className="hidden flex-col items-center cursor-pointer md:flex">
               <img
@@ -132,7 +162,6 @@ const Header = (props) => {
           </div>
         </div>
 
-        
         {mobileMenuOpen && (
           <div className="md:hidden bg-white p-4 shadow-lg">
             <div className="flex flex-col space-y-4">
@@ -187,8 +216,7 @@ const Header = (props) => {
           </div>
         )}
 
-        
-        {ismenu && !mobileMenuOpen ? (
+        {ismenu && !mobileMenuOpen && !props.show ? (
           <div
             className={`w-full bg-white px-6 md:px-16 transition-all duration-300 ease-in-out overflow-hidden ${
               isHidden
@@ -214,6 +242,9 @@ const Header = (props) => {
           </div>
         ) : null}
       </div>
+      {isMapOpen && (
+        <MapModal onClose={() => setIsMapOpen(false)} userId={user} />
+      )}
     </div>
   );
 };

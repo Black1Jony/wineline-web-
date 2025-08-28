@@ -1,59 +1,52 @@
 import { useState, useEffect } from "react";
 import "./logincss.css";
 import { useNavigate } from "react-router-dom";
-import {
-  registerWithEmail,
-  loginWithEmail,
-} from "../../utils/firebase/auth/loginAuth";
-import {
-  signInWithGoogle,
-  signInWithGitHub,
-} from "../../utils/firebase/auth/signWithprovider";
-import { FaGithub } from "react-icons/fa";
-import { FaGoogle } from "react-icons/fa";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 import { message } from "antd";
+import axios from "axios";
+
 export default function LoginPage() {
   const [isLoginForm, setIsLoginForm] = useState(true);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage()
-  
+  const [messageApi, contextHolder] = message.useMessage();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const token = localStorage.getItem("token");
-  
+
   const navigate = useNavigate();
-useEffect(() => {
-  if (token) {
-    navigate("/");
-   
-  }
-  
-}, []);
+
+  useEffect(() => {
+    if (token) {
+      messageApi.info("Вы уже авторизованы");
+      navigate("/");
+    }
+  }, []);
+
   const toggleForm = () => {
     setIsLoginForm(!isLoginForm);
-    setError("");
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
-      const res = await loginWithEmail(email, password);
-      if (res !== "error" && res !== "errorData") {
-        localStorage.setItem("token", res.accessToken);
+      const res = await axios.post("http://localhost:3000/signIn", {
+        email,
+        password,
+      });
+
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", res.data.id);
+        messageApi.success("Вход выполнен");
         navigate("/");
-      } else {
-        setError("Неверный email или пароль");
       }
     } catch (err) {
-      setError("Ошибка при входе");
-      console.log(err);
-      
+      messageApi.error(err.response?.data?.message || "Ошибка входа");
     } finally {
       setLoading(false);
     }
@@ -62,42 +55,33 @@ useEffect(() => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     if (password !== repeatPassword) {
-      setError("Пароли не совпадают");
+      messageApi.error("Пароли не совпадают");
       setLoading(false);
       return;
     }
 
     try {
-      const res = await registerWithEmail(
+      const res = await axios.post("http://localhost:3000/signUp", {
+        name,
         email,
         password,
-        repeatPassword,
-        name
-      );
-      if (res !== "error" && res !== "errorData") {
-        localStorage.setItem("token", res.accessToken);
+      });
+
+      if (res.data.user?.token) {
+        localStorage.setItem("token", res.data.user.token);
+        localStorage.setItem("user", res.data.user.id);
+        messageApi.success("Регистрация успешна");
         navigate("/");
-      } else {
-        setError("Ошибка при регистрации");
       }
     } catch (err) {
-      setError("Ошибка при регистрации");
-      console.log(err);
+      messageApi.error(err.response?.data?.message || "Ошибка регистрации");
     } finally {
       setLoading(false);
     }
   };
-  const messageAlreadyHAveAccount = ()=>{
-    messageApi.open(
-    {
-      type: 'error',
-      content: 'Уже есть аккаунт',
-    }
-    )
-  }
+
   return (
     <>
       {contextHolder}
@@ -107,43 +91,9 @@ useEffect(() => {
             <h2>Добро пожаловать!</h2>
             <p>Войдите или зарегистрируйтесь для доступа к сервису.</p>
             <div className="social-buttons">
-              <FaGoogle 
-               className="w-12 h-12"
-                onClick={async () => {
-                  const result = await signInWithGoogle();
-
-                  if (result.success) {
-                    localStorage.setItem("token", result.token);
-                    navigate("/");
-                  } else if (
-                    result.error?.code ===
-                    "auth/account-exists-with-different-credential"
-                  ) {
-                    setError(
-                      "Учетная запись уже существует с другим способом входа"
-                    );
-                  } else {
-                    setError("Ошибка входа через Google");
-                  }
-                }}
-              />
-              <FaGithub
-                className="w-12 h-12"
-                onClick={async () => {
-                  const result = await signInWithGitHub();
-
-                  if (result.success) {
-                    localStorage.setItem("token", result.token);
-                    navigate("/");
-                  } else if (result.conflict) {
-                    setError(
-                      "Учетная запись уже существует с другим способом входа"
-                    );
-                  } else {
-                    setError("Ошибка входа через GitHub");
-                  }
-                }}
-              />
+              <button className="w-full rounded-2xl bg-orange-400 text-center p-1 h-10" onClick={()=> navigate('/')}>
+                вернутся на главную
+              </button>
             </div>
           </div>
 
@@ -151,11 +101,8 @@ useEffect(() => {
             <div className={`form-toggle ${isLoginForm ? "" : "flipped"}`}>
               <div className="form-front mt-13">
                 <h2>Вход в аккаунт</h2>
-                {error && <div className="error-message">{error}</div>}
-
                 <form className="auth-form" onSubmit={handleLogin}>
                   <div className="input-group">
-                    <i className="fas fa-envelope"></i>
                     <input
                       type="email"
                       placeholder="Email"
@@ -164,9 +111,7 @@ useEffect(() => {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-
                   <div className="input-group">
-                    <i className="fas fa-lock"></i>
                     <input
                       type="password"
                       placeholder="Пароль"
@@ -175,13 +120,6 @@ useEffect(() => {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-
-                  <div className="form-options">
-                    <label>
-                      <input type="checkbox" /> Запомнить меня
-                    </label>
-                  </div>
-
                   <button
                     type="submit"
                     className="btn-submit"
@@ -189,7 +127,6 @@ useEffect(() => {
                   >
                     {loading ? "Загрузка..." : "Войти"}
                   </button>
-
                   <p className="form-switch">
                     Нет аккаунта?{" "}
                     <button
@@ -205,11 +142,8 @@ useEffect(() => {
 
               <div className="form-back">
                 <h2>Создать аккаунт</h2>
-                {error && <div className="error-message">{error}</div>}
-
                 <form className="auth-form" onSubmit={handleRegister}>
                   <div className="input-group">
-                    <i className="fas fa-user"></i>
                     <input
                       type="text"
                       placeholder="Имя"
@@ -218,9 +152,7 @@ useEffect(() => {
                       onChange={(e) => setName(e.target.value)}
                     />
                   </div>
-
                   <div className="input-group">
-                    <i className="fas fa-envelope"></i>
                     <input
                       type="email"
                       placeholder="Email"
@@ -229,9 +161,7 @@ useEffect(() => {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-
                   <div className="input-group">
-                    <i className="fas fa-lock"></i>
                     <input
                       type="password"
                       placeholder="Пароль"
@@ -241,9 +171,7 @@ useEffect(() => {
                       minLength={6}
                     />
                   </div>
-
                   <div className="input-group">
-                    <i className="fas fa-lock"></i>
                     <input
                       type="password"
                       placeholder="Повторите пароль"
@@ -253,14 +181,6 @@ useEffect(() => {
                       minLength={6}
                     />
                   </div>
-
-                  <label className="terms-checkbox">
-                    <input type="checkbox" required />Я согласен с{" "}
-                    <button type="button" className="text-link">
-                      условиями
-                    </button>
-                  </label>
-
                   <button
                     type="submit"
                     className="btn-submit"
@@ -268,7 +188,6 @@ useEffect(() => {
                   >
                     {loading ? "Загрузка..." : "Зарегистрироваться"}
                   </button>
-
                   <p className="form-switch">
                     Уже есть аккаунт?{" "}
                     <button

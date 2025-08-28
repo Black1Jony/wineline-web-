@@ -1,7 +1,7 @@
 import './tags.css'
 const Line = ({rate} ) =>{
   const num = rate.replace(/\D/g, "");
-  const percent = 100 / num;
+  const percent = 20 * num;
   const last = "\u00A0" + rate.slice(-1);
   const first = rate.slice(0, -1); + "  "
   return (

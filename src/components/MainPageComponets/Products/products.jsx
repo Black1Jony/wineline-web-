@@ -6,14 +6,15 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
+import { hiddenStore } from "../../../utils/store/hiddenStore";
 const Products = ({ items, first }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [nowType, setNowType] = useState(first);
   const [nowCard, setNowCard] = useState(0);
   const swiperRef = useRef(null);
-
+  const hiddeProduct = hiddenStore((state) => state.hiddenProduct);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,11 +40,15 @@ const Products = ({ items, first }) => {
     }
   }, [nowCard]);
 
-
+const visibleItems =
+  products[nowCard]?.value?.filter((i) => i.images?.[0]) || [];
   if (loading) {
     return <div className="text-center mt-10 text-lg">Загрузка...</div>;
   }
 
+  console.log(hiddeProduct);
+  
+  
   return (
     <div className="flex flex-col gap-6 w-[92%] mt-16 mx-auto">
       <div className="flex gap-8 overflow-x-scroll scrollbar-hide">
@@ -77,7 +82,7 @@ const Products = ({ items, first }) => {
           </div>
         )}
       </div>
-       
+
       <Swiper
         className="w-full relative"
         slidesPerView={2}
@@ -101,7 +106,7 @@ const Products = ({ items, first }) => {
           swiperRef.current = swiper;
         }}
       >
-        {products[nowCard]?.value?.map((i) => (
+        {visibleItems.map((i) => (
           <SwiperSlide key={i.id}>
             <Card data={i} />
           </SwiperSlide>

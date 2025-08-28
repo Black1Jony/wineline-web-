@@ -51,7 +51,7 @@ export const category = [
     id: 9,
     name: "подарочные сертификаты",
     image: "/assets/bottles/cards 1.svg",
-    path: '/card'
+    path: '/cards'
   },
   {
     id: 10,

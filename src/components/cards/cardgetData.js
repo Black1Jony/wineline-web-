@@ -77,6 +77,17 @@ export const getinfo = (data) => {
          ? data.characteristics?.Characteristics?.Объем
          : ""
      }`;
+  }else if(type == 'Вода'){
+    return `${
+      data.characteristics?.Characteristics?.["Страна, регион"]
+        ? data.characteristics?.Characteristics?.["Страна, регион"]
+        : ""
+    } ${", "}
+     ${
+       data.characteristics?.Characteristics?.Объем
+         ? data.characteristics?.Characteristics?.Объем
+         : ""
+     }`;
   }
   return "";
 };

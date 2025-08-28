@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Header from "../../components/Header/Header";
@@ -8,12 +8,16 @@ import InfoTovar from "../../components/TovarComponent/infoTovar/InfoTovar";
 import BuyTovar from "../../components/TovarComponent/infoTovar/BuyTovar/BuyTovar";
 import Products from "../../components/MainPageComponets/Products/products";
 import Tags from "../../components/TovarComponent/infoTovar/Tags";
-
+import "../../components/TovarComponent/infoTovar/InfoTovarTwo.jsx";
+import InfoTovarTwo from "../../components/TovarComponent/infoTovar/InfoTovarTwo.jsx";
+import Tegi from "../../components/TovarComponent/infoTovar/Tegi/Tegi.jsx";
+import Footer from "../../components/Footer/Footer.jsx";
 const TovarPage = () => {
   const { id } = useParams();
   const [tovar, setTovar] = useState(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const getProduct = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/product/${id}`);
@@ -31,43 +35,51 @@ const TovarPage = () => {
     Коньяк: "konyak",
     Виски: "whiskey",
     Вода: "voda",
+    Джин: 'gin'
   };
 
- const fetchBrandItems = useCallback(async () => {
-   const catKey = category[tovar?.category];
-   const producer = tovar?.characteristics?.wineCharacteristics?.Производитель;
+  const fetchBrandItems = useCallback(
+    async (params, name) => {
+      const catKey = category[tovar?.category];
+      const producer =
+        tovar?.characteristics?.wineCharacteristics?.Производитель;
 
-   if (!catKey || !producer) return [];
+      if (!catKey || !producer) return [];
 
-   try {
-     const response = await axios.get(
-       `http://localhost:3000/catalog/${catKey}`,
-       {
-         params: { Brend: producer },
-       }
-     );
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/catalog/${catKey}`,
+          {
+            params: params,
+          }
+        );
 
-     const items = response.data?.data ?? [];
+        const items = response.data?.data ?? [];
 
-     // 🔧 Обернём в нужную структуру:
-     return [
-       {
-         name: producer,
-         value: items,
-       },
-     ];
-   } catch (error) {
-     console.error("Ошибка при загрузке брендов:", error);
-     return [];
-   }
- }, [
-   tovar?.category,
-   tovar?.characteristics?.wineCharacteristics?.Производитель,
- ]);
+        return [
+          {
+            name,
+            value: items,
+          },
+        ];
+      } catch (error) {
+        console.error("Ошибка при загрузке брендов:", error);
+        return [];
+      }
+    },
+    [
+      tovar?.category,
+      tovar?.characteristics?.wineCharacteristics?.Производитель,
+    ]
+  );
 
   if (!tovar?.id) {
     return <div className="text-center mt-10 text-lg">Загрузка товара...</div>;
   }
+
+  const seems = tovar?.tags.find((tag) => tag.type === "Вкус")?.items;
+
+  
 
   return (
     <>
@@ -83,29 +95,41 @@ const TovarPage = () => {
           type={tovar?.category}
           rating={tovar?.rating}
         />
-        <BuyTovar price={tovar?.price?.meta} discount={tovar?.price?.sale} />
+        <BuyTovar price={tovar?.price?.meta} discount={tovar?.price?.sale} data={tovar} />
       </div>
 
       {tovar?.category &&
         tovar?.characteristics?.wineCharacteristics?.Производитель && (
           <Products
-            items={fetchBrandItems}
-            first={"Другие товары этого бренда"}
+            items={() =>
+              fetchBrandItems(
+                {
+                  taste: seems,
+                },
+                "Схожее по вкусу"
+              )
+            }
           />
         )}
+
       <div className="w-[92%] self-center mt-10 flex flex-col justify-self-center">
-        <h1 className="text-3xl  font-Arial !font-semibold border-b p-6 border-b-[#7a7a7a]">
+        <h1 className="text-3xl font-Arial !font-semibold border-b p-6 border-b-[#7a7a7a]">
           Характеристика
         </h1>
-        <div className="w-full flex justify-between  mt-5 p-6 gap-5">
+        <div className="w-full flex justify-between mt-5 p-6 gap-5">
           <div className="w-2/5 flex flex-col gap-5">
             <Tags Tags={tovar?.characteristics.tasteProfile} />
+            <InfoTovarTwo
+              data={tovar?.characteristics?.wineCharacteristics}
+              type={tovar.category}
+            />
           </div>
           <div className="w-4/6 flex flex-col gap-3">
             {tovar?.description &&
               tovar.description.map((item, index) => (
-                <div key={index} сlassName="flex flex-col gap-2">
-                  <h1 className="text-[18px] font-Arial  !font-semibold">
+                <div key={index} className="flex flex-col gap-2">
+                  {" "}
+                  <h1 className="text-[18px] font-Arial !font-semibold">
                     {item.title}
                   </h1>
                   <p className="text-lg font-Arial text-[#000]">{item.text}</p>
@@ -113,7 +137,27 @@ const TovarPage = () => {
               ))}
           </div>
         </div>
+       
       </div>
+
+      {tovar?.tags && <div className="w-[92%] self-center mt-10 flex flex-col justify-self-center">
+        <h1 className="text-3xl font-Arial !font-meduim border-b p-6 border-b-[#7a7a7a] scale-y-110">
+          Теги
+        </h1>
+        <Tegi tags={tovar?.tags} />
+      </div>}
+      <Products
+        items={() =>
+          fetchBrandItems(
+            {
+              Brend: tovar?.characteristics?.wineCharacteristics?.Производитель,
+            },
+            "Другие товары этого бренда"
+          )
+        }
+        first={"Другие товары этого бренда"}
+      />
+      <Footer/>
     </>
   );
 };

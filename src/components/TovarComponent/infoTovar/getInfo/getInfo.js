@@ -1,5 +1,5 @@
 import fieldGroups from './info.json';
-export const extractCategoryWithOther= (data, type)=>  {
+export const extractCategoryWithOther= (data, type, all)=>  {
   const categoryFields = fieldGroups[type] || [];
   const usedKeys = new Set();
   const main = [];
@@ -17,7 +17,12 @@ export const extractCategoryWithOther= (data, type)=>  {
       other.push({ label: key, value: data[key] });
     }
   }
-
+  if (all) {
+    return [
+      ...main,
+      ...other
+    ]
+  }
   return {
     main,
     other
