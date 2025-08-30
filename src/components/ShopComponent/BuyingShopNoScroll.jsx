@@ -5,7 +5,7 @@ import { Modal, Input, Button, message as antdMessage } from "antd";
 import Cards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
 
-const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
+const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
   const deleteAll = shopStore((state) => state.clearProducts);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -27,7 +27,6 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
 
   const [messageApi, contextHolder] = antdMessage.useMessage();
 
-  // -------------------- Работа с картой --------------------
   const handleInputChange = (e) => {
     let { name, value } = e.target;
     if (name === "number") {
@@ -79,13 +78,14 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
     return true;
   };
 
-  // -------------------- Применение промокода --------------------
   const applyPromoCode = async () => {
     if (!promoCode.trim()) return;
     try {
       const response = await api.post(
         `/apply/${localStorage.getItem("user")}`,
-        { code: promoCode.trim() }
+        {
+          code: promoCode.trim(),
+        }
       );
 
       setAppliedPromo(response.data);
@@ -100,7 +100,6 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
     }
   };
 
-  // -------------------- Оплата картой --------------------
   const handleBuy = async () => {
     if (!validateCard()) return;
     if (!(Number(amount) > 0)) {
@@ -121,52 +120,21 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
         `Покупка успешно оформлена! Код: ${response.data.code}`
       );
 
-      // Очистка корзины сразу
+      // Убираем товары сразу после успешной покупки
       deleteAll();
       localStorage.removeItem("shop-storage");
-      await api.delete(`/shop/${localStorage.getItem("user")}`);
 
+      // Сброс полей
       setModalOpen(false);
       setCardData({ number: "", name: "", expiry: "", cvc: "", focus: "" });
       setPromoCode("");
       setAppliedPromo(null);
       setDiscount(0);
       setAmount(0);
-      messageApi.success("Покупка прошла успешна");
     } catch (err) {
       messageApi.error(
         "Ошибка при оформлении: " + (err.response?.data?.error || err.message)
       );
-    }
-  };
-
-  const handlePayWithPoints = async () => {
-    const uid = localStorage.getItem("user");
-    if (!uid) {
-      messageApi.error("Пользователь не найден");
-      return;
-    }
-    if (userScore <= 0) {
-      messageApi.warning("Недостаточно баллов");
-      return;
-    }
-    setIsPayingWithPoints(true);
-    try {
-      if (!(Number(amount) > 0)) {
-        messageApi.error("Сумма должна быть положительной");
-        return;
-      }
-      await api.post(`/user/score`, { id: uid, amount: Number(amount) });
-      messageApi.success("Оплата баллами прошла успешно!");
-
-      deleteAll();
-      localStorage.removeItem("shop-storage");
-    } catch (err) {
-      messageApi.error(
-        err?.response?.data?.error || "Ошибка при оплате баллами"
-      );
-    } finally {
-      setIsPayingWithPoints(false);
     }
   };
 
@@ -192,7 +160,9 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
   }, [price, discount]);
 
   useEffect(() => {
-    const handleResize = () => setIsVisible(window.innerWidth > 768);
+    const handleResize = () => {
+      setIsVisible(window.innerWidth <= 768);
+    };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -204,24 +174,18 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
         {contextHolder}
         <div
           ref={refProp}
-          className={`w-full flex flex-col gap-3 bg-white h-auto md:h-[450px] rounded-2xl p-4 md:flex ${
-            isScrollable ? "sticky top-5" : "mt-4"
-          }`}
+          className="w-full flex flex-col gap-3 bg-white h-auto rounded-2xl p-4"
         >
-          {/* Очистка корзины */}
           <div
             className="text-2xl font-Arial !font-semibold text-[#c2c2c2] cursor-pointer"
-            onClick={async() => {
+            onClick={() => {
               deleteAll();
-              api.delete(`/shop/${localStorage.getItem('user')}`)
               localStorage.removeItem("shop-storage");
-              messageApi.success("Корзина очищена!");
             }}
           >
             Очистить корзину
           </div>
 
-          {/* Промокод */}
           <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="text"
@@ -238,7 +202,6 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
             </Button>
           </div>
 
-          {/* Инфо о сумме */}
           <div className="flex flex-col font-Arial border-b border-[#b4b4b4] gap-2 w-full text-[#a5a5a5]">
             <div className="flex justify-between w-full">
               <h1 className="text-xl">Всего Товаров</h1>
@@ -258,23 +221,19 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
 
           <div className="flex justify-between">
             <h1 className="text-3xl font-arial !font-semibold">Итого</h1>
-            <h1 className="text-3xl font-arial !font-semibold">
-              {Number(amount) || 0} ₽
-            </h1>
+            <h1 className="text-3xl font-arial !font-semibold">{Number(amount) || 0} ₽</h1>
           </div>
 
-          {/* Оплата баллами */}
           {userScore > 0 && (
             <Button
               disabled={isPayingWithPoints || amount <= 0}
               className="flex justify-center items-center w-full rounded-2xl bg-[#8a2be2] !font-Arial text-xl text-white"
-              onClick={handlePayWithPoints}
+              onClick={() => {}}
             >
               Оплатить баллами (доступно: {userScore})
             </Button>
           )}
 
-          {/* Оплата картой */}
           <Button
             className="flex justify-center items-center w-full rounded-2xl bg-[#3a3a3a] !font-Arial text-2xl text-white"
             onClick={() => setModalOpen(true)}
@@ -283,7 +242,6 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
           </Button>
         </div>
 
-        {/* Модальное окно оплаты */}
         <Modal
           open={modalOpen}
           footer={null}
@@ -352,4 +310,4 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
   );
 };
 
-export default BuyingShop;
+export default BuyingShopNoScroll;

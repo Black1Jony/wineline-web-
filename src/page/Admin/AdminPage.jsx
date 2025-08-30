@@ -6,30 +6,62 @@ import AdminDeleteTovars from "../../components/AdminComponents/Tovars/adminDele
 import Add from "../../components/AdminComponents/Add/Add";
 import AddEvents from "../../components/AdminComponents/AddEvents/AddEvents";
 import { useEffect } from "react";
-import axios from "axios";
+import api from "../../utils/api";
+
 const AdminPage = () => {
   const [currentOperation, setCurrentOperation] = useState("Пользовтели");
+  const [loading, setLoading] = useState(true); // Add loading state
   const categories = ["Пользовтели", "товары", "Добавить товары", "Добавить мероптиятие"];
-  useEffect(()=>{
-    const user = localStorage.getItem('user')
-    if(!user) window.location.pathname = "/";
-    const isAdmin = async()=>{
-     const resp = await axios.get(`http://localhost:3000/users/${user}`);
-     if(resp.data.role !== 'admin' ) window.location.pathname = '/'
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      window.location.pathname = "/";
+      return;
     }
-    isAdmin()
-  }, [])
+
+    let isMounted = true;
+
+    const isAdmin = async () => {
+      try {
+        const resp = await api.get(`/users/${user}`);
+        if (isMounted) {
+          if (resp.data.role !== "admin") {
+            window.location.pathname = "/";
+          } else {
+            setLoading(false); 
+          }
+        }
+      } catch (error) {
+        console.error("Error verifying admin:", error);
+        if (isMounted) {
+          window.location.pathname = "/";
+        }
+      }
+    };
+
+    isAdmin();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator while checking
+  }
+
   return (
     <>
       <Header show={true} />
       <div className="flex flex-col gap-8 w-[92%] self-center justify-self-center font-Arial mt-[20vh]">
         <div className="w-full flex flex-col gap-8 hide-scrollbar md:flex-row">
-          {categories.map((i, ind) => (
+          {categories.map((i) => (
             <h1
-              className={`text-xl cursor-pointer   scale-y-110 font-Arial !font-semibold ${
-                currentOperation == i ? "text-[#c42222]" : "text-[#0f0f0f]"
+              className={`text-xl cursor-pointer scale-y-110 font-Arial !font-semibold ${
+                currentOperation === i ? "text-[#c42222]" : "text-[#0f0f0f]"
               }`}
-              key={ind}
+              key={i}
               onClick={() => setCurrentOperation(i)}
             >
               {i}
@@ -37,16 +69,21 @@ const AdminPage = () => {
           ))}
         </div>
         <div className="w-full min-h-[75vh]">
-          {currentOperation === "Пользовтели" && <Users />}
-          {currentOperation === "товары" && <AdminDeleteTovars />}
-          {currentOperation === "Добавить товары" && <Add />}
-          {currentOperation === "Добавить мероптиятие" && <AddEvents/>}
+          <div className="w-full min-h-[75vh]">
+            {
+              {
+                Пользовтели: <Users />,
+                товары: <AdminDeleteTovars />,
+                "Добавить товары": <Add />,
+                "Добавить мероптиятие": <AddEvents />,
+              }[currentOperation]
+            }
+          </div>
         </div>
       </div>
       <Footer />
     </>
   );
 };
-
 
 export default AdminPage;

@@ -1,5 +1,5 @@
 
-import axios from "axios";
+import api from "../../../utils/api";
 import { useState, useEffect } from "react";
 import { Pagination } from "antd";
 import Card from "../../cards/card";
@@ -15,8 +15,8 @@ const AdminDeleteTovars = () => {
   const allTypes = ["Вино", "шампанское", "Виски", "Коньяк", "Джин", "вода"];
 
   const getProduct = async (page = currentPage) => {
-    const resp = await axios.get(
-      `http://localhost:3000/search?q=${query}&type=${type}&page=${page}`
+    const resp = await api.get(
+      `/search?q=${query}&type=${type}&page=${page}`
     );
     setTovars(resp.data.data);
     setTotalItems(resp.data.total);
@@ -37,13 +37,13 @@ const AdminDeleteTovars = () => {
        вода: "voda",
      };
 
-     await axios.delete(
-       `http://localhost:3000/product/${types[category]}/${id}`
+     await api.delete(
+       `/product/${types[category]}/${id}`
      );
 
      // после удаления обновляем список
-     const resp = await axios.get(
-       `http://localhost:3000/search?q=${query}&type=${type}&page=${currentPage}`
+     const resp = await api.get(
+       `/search?q=${query}&type=${type}&page=${currentPage}`
      );
      setTovars(resp.data.data);
      setTotalItems(resp.data.total);

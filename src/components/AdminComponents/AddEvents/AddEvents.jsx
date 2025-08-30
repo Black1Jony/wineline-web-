@@ -10,7 +10,7 @@ import {
   TimePicker,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import axios from "axios";
+import api from "../../../utils/api";
 import dayjs from "dayjs";
 
 const { Title } = Typography;
@@ -69,8 +69,8 @@ const AddEvents = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/event",
+      const response = await api.post(
+        "/event",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -97,8 +97,10 @@ const AddEvents = () => {
   };
 
   return (
+       <>
+    {contextHolder}
     <div className="w-full flex flex-col gap-6 p-4">
-      {contextHolder}
+      
       <Title level={4}>Добавление события</Title>
 
       <DatePicker
@@ -172,6 +174,7 @@ const AddEvents = () => {
         Создать событие
       </Button>
     </div>
+    </>
   );
 };
 

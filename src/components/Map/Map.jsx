@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import axios from "axios";
+import api from "../../utils/api";
 import { message } from "antd";
 
 const MapModal = ({ onClose, userId }) => {
@@ -18,8 +18,8 @@ const MapModal = ({ onClose, userId }) => {
 
   const fetchAddress = async (lat, lon) => {
     try {
-      const res = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
+      const res = await api.get(
+        `/nominatim/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
       );
       if (res.data && res.data.display_name) {
         setAddress(res.data.display_name);
@@ -88,7 +88,7 @@ const MapModal = ({ onClose, userId }) => {
   const handleSave = async () => {
     try {
       // сохраняем в бэкенд
-      await axios.post("http://localhost:3000/geoposition", {
+      await api.post("/geoposition", {
         id: userId,
         lat: position[0],
         lon: position[1],

@@ -1,8 +1,8 @@
-import axios from "axios";
+import api from "../../../utils/api";
 
 const raiting = async (url) => {
   try {
-    const response = await axios.get(url);
+    const response = await api.get(url);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -10,13 +10,13 @@ const raiting = async (url) => {
 };
 
 export const firstitems = async () => {
-  const data = await raiting("http://localhost:3000/all?limit=25");
+  const data = await raiting("/all?limit=25");
   const alcohol = await raiting(
-    "http://localhost:3000/all?sortBy=alcohol&limit=25"
+    "/all?sortBy=alcohol&limit=25"
   );
   
   const promotion = await raiting(
-    "http://localhost:3000/all?sortBy=promotion&limit=25"
+    "/all?sortBy=promotion&limit=25"
   );
 
   const items = [
@@ -29,13 +29,13 @@ export const firstitems = async () => {
 };
 
 export const secondItems = async () => {
-  const ksn = await raiting("http://localhost:3000/ksn");
+  const ksn = await raiting("/ksn");
   const prs = await raiting(
-    "http://localhost:3000/present"
+    "/present"
   );
-  const prsKonyak = await raiting("http://localhost:3000/present?type=konyak");
+  const prsKonyak = await raiting("/present?type=konyak");
     const prsViski = await raiting(
-      "http://localhost:3000/present?type=viski"
+      "/present?type=viski"
     );
 
 
@@ -50,7 +50,7 @@ export const secondItems = async () => {
 };
 
 export const thirdItems = async () => {
-  const data = await raiting("http://localhost:3000/all?sortBy=sale");
+  const data = await raiting("/all?sortBy=sale");
  
 
 

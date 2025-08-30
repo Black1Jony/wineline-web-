@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from "../../../utils/api";
 const getFiltersFromServer = async (type)=>{
-  const responce = await axios.get(`http://localhost:3000/allfilter/${type}`);
+  const responce = await api.get(`/allfilter/${type}`);
   return responce.data;
 }
 export default getFiltersFromServer;

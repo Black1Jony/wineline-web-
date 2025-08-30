@@ -12,7 +12,7 @@ import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import fields from "./addfiels.json";
 import AddDescription from "./AddDescription";
-import axios from "axios";
+import api from "../../../utils/api";
 
 const { Title } = Typography;
 
@@ -312,24 +312,24 @@ const Add = () => {
             <div>
               <Title level={5}>Гастрономия</Title>
               {alldata.tags[0].items.map((item, idx) => (
-                <Space
+                <div
                   key={idx}
-                  direction="vertical"
-                  className="w-full sm:flex-row sm:items-center sm:gap-4 mb-2"
+                  className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2 w-full sm:w-3/5 lg:w-2/5"
                 >
                   <Input
                     placeholder="Гастрономический тег"
                     value={item}
                     onChange={(e) => handleTagChange(idx, e.target.value)}
-                    className="!w-full sm:!w-3/5 lg:!w-2/5"
+                    className="flex-1"
                   />
                   <Button
                     type="text"
                     icon={<MinusOutlined />}
                     danger
                     onClick={() => removeTagRow(idx)}
+                    className="sm:w-auto w-full"
                   />
-                </Space>
+                </div>
               ))}
               <Button
                 type="dashed"
@@ -389,8 +389,8 @@ const Add = () => {
                 });
 
                 try {
-                  const response = await axios.post(
-                    `http://localhost:3000/add/${types[alldata.category]}`,
+                  const response = await api.post(
+                    `/add/${types[alldata.category]}`,
                     formData,
                     { headers: { "Content-Type": "multipart/form-data" } }
                   );

@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from "react";
 import { Pagination, Button } from "antd";
 import { motion, useInView } from "framer-motion";
 import { MenuOutlined } from "@ant-design/icons";
-import axios from "axios";
+import api from "../../utils/api";
 import { useFilterStore } from "../../utils/store/filterstore";
 import { useCountStore } from "../../utils/store/countTovarsstore";
 import { hiddenStore } from "../../utils/store/hiddenStore";
@@ -57,7 +57,7 @@ const Katolog = () => {
     const getCatalog = async () => {
       setLoading(true);
       try {
-        const resp = await axios.get(`http://localhost:3000/catalog/${type}`, {
+        const resp = await api.get(`/catalog/${type}`, {
           params: { ...filters, page },
         });
         setCatalog((prev) =>

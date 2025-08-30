@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Card from "../../components/cards/card";
 import Footer from "../../components/Footer/Footer";
-import axios from "axios";
+import api from "../../utils/api";
 
 const SearchPage = () => {
   const [searchResults, setSearchResults] = useState([]);
@@ -28,8 +28,8 @@ const SearchPage = () => {
     const getSearch = async () => {
       setLoading(true);
       try {
-        const responce = await axios.get(
-          `http://localhost:3000/search?${query}&page=${currentPage}`
+        const responce = await api.get(
+          `/search?${query}&page=${currentPage}`
         );
 
         setSearchResults((prev) => [...prev, ...responce.data.data]);

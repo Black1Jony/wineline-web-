@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import "dayjs/locale/ru.js";
@@ -33,7 +33,7 @@ const Event = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const resp = await axios.get(`http://localhost:3000/event/${id}`);
+      const resp = await api.get(`/event/${id}`);
       setData(resp.data.data);
     };
     getData();

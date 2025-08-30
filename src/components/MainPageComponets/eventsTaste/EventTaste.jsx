@@ -1,7 +1,7 @@
 import RedBanner from "./redBanner/RedBannner";
 import TasteSkeleton from "../../Skeletons/TasteSkeleton";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../../utils/api";
 import dayjs from "dayjs";
 import "dayjs/locale/ru.js";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +34,7 @@ const EventTaste = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const resp = await axios.get("http://localhost:3000/event", {
+        const resp = await api.get("/event", {
           params: { byDate: false }, // получаем обычный массив событий
         });
         setData(resp.data.data.slice(0, 4)); // берем первые 4 события

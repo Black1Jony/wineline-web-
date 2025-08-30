@@ -1,4 +1,4 @@
-import axios from "axios"
+import api from "../../utils/api"
 import Header from "../../components/Header/Header"
 import Card from "../../components/cards/card"
 import { favoriteStore } from "../../utils/store/favoriteStore"
@@ -20,7 +20,7 @@ if(!localStorage.getItem('user')) window.location.pathname = '/'
               try {
                 const responses = await Promise.all(
                   favorite.map((id) =>
-                    axios.get(`http://localhost:3000/product/${id}`)
+                    api.get(`/product/${id}`)
                   )
                 );
                 setFavorites(responses.map((r) => r.data));

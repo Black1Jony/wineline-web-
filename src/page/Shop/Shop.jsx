@@ -1,9 +1,10 @@
 import { useRef, useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import MainShop from "../../components/ShopComponent/MainShop";
 import BuyingShop from "../../components/ShopComponent/BuyingShop";
+import BuyingShopNoScroll from "../../components/ShopComponent/BuyingShopNoScroll";
 import { shopStore } from "../../utils/store/shopStore";
 
 const Shop = () => {
@@ -17,51 +18,54 @@ const Shop = () => {
   const paymentRef = useRef(null);
   if (!localStorage.getItem("user")) window.location.pathname = "/";
   useEffect(() => {
-    if (user) {
-      const getShop = async () => {
-        const responce = await axios.get(
-          `http://localhost:3000/users/${user}?key=${user}`
-        );
+    if (!user) return;
 
+    const getShop = async () => {
+      try {
+        const responce = await api.get(`/users/${user}`);
         if (responce?.data?.shop) {
           const products = await Promise.all(
             responce.data.shop.map(async (i) => {
-              const product = await axios.get(
-                `http://localhost:3000/product/${i.product}`
-              );
+              const product = await api.get(`/product/${i.product}`);
               return { ...i, ...product.data };
             })
           );
-          const totalCount = productsStore.reduce(
-            (acc, item) => acc + item.count,
-            0
-          );
-
+          const totalCount = productsStore.reduce((acc, item) => acc + item.count, 0);
           setAllProduct(totalCount);
-
           setShop(products);
+        } else {
+          setShop([]);
+          setAllProduct(0);
         }
-      };
-      getShop();
-      const totalPrice = shop?.reduce(
-        (acc, item) => acc + +item.price.meta * +item.count,
-        0
-      );
-      setBuyingProduct(totalPrice);
-    }
+      } catch {
+        setShop([]);
+      }
+    };
+    getShop();
   }, [user, productsStore]);
+
+  useEffect(() => {
+    const totalPrice = shop?.reduce((acc, item) => acc + (+item?.price?.meta || 0) * (+item?.count || 0), 0) || 0;
+    setBuyingProduct(totalPrice);
+  }, [shop]);
 
   return (
     <>
       <Header show={true} />
-      <div className="min-h-full w-full bg-[#f5f5f5] flex justify-center items-center">
-        {shop && productsStore.length > 0 ? (
-          <div className="!mt-[40vh] w-[80%] flex gap-12 mb-25 relative ">
-            <div className="flex-1 min-w-[60%] relative">
+      <div className="min-h-full w-full bg-[#f5f5f5] flex justify-center items-center px-3 md:px-6">
+        {Array.isArray(shop) && shop.length > 0 && productsStore.length > 0 ? (
+          <div className="!mt-[40vh] w-full lg:w-[80%] flex flex-col md:flex-row gap-6 md:gap-10 lg:gap-12 mb-25 relative ">
+            <div className="flex-1 min-w-full md:min-w-[60%] relative">
               <MainShop count={allProduct} refProp={productsRef} />
             </div>
-            <div className="w-5/12 min-w-[300px] relative">
+            <div className="w-full md:w-5/12 min-w-[300px] relative">
               <BuyingShop
+                count={allProduct}
+                price={buyingProduct}
+                refProp={paymentRef}
+                productsRef={productsRef}
+              />
+              <BuyingShopNoScroll
                 count={allProduct}
                 price={buyingProduct}
                 refProp={paymentRef}

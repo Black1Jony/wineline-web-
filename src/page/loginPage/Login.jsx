@@ -3,7 +3,7 @@ import "./logincss.css";
 import { useNavigate } from "react-router-dom";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { message } from "antd";
-import axios from "axios";
+import api from "../../utils/api";
 
 export default function LoginPage() {
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -34,7 +34,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3000/signIn", {
+      const res = await api.post("/signIn", {
         email,
         password,
       });
@@ -63,7 +63,7 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await axios.post("http://localhost:3000/signUp", {
+      const res = await api.post("/signUp", {
         name,
         email,
         password,

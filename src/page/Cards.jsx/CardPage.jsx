@@ -4,7 +4,7 @@ import { Modal, Radio, Input, Button, message as antdMessage } from "antd";
 import { useState } from "react";
 import Cards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
-import axios from "axios";
+import api from "../../utils/api";
 import {
   GiftOutlined,
   CreditCardOutlined,
@@ -48,7 +48,7 @@ const CardPage = () => {
     try {
       const code = `${certificateName}-${Date.now()}`;
 
-      const response = await axios.post("http://localhost:3000/card", {
+      const response = await api.post("/card", {
         code,
         amount: value,
         infinite: false,

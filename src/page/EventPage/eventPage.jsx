@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { Card, Row, Col, DatePicker, InputNumber, Space } from "antd";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -29,7 +29,7 @@ const EventPage = () => {
       if (filters.minPrice) params.minPrice = filters.minPrice;
       if (filters.maxPrice) params.maxPrice = filters.maxPrice;
 
-      const resp = await axios.get("http://localhost:3000/event", { params });
+      const resp = await api.get("/event", { params });
       setEventsByDate(resp.data.data);
     } catch (err) {
       console.error("Ошибка при загрузке событий", err);

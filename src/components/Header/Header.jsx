@@ -3,7 +3,7 @@ import "./header.css";
 import { useNavigate } from "react-router-dom";
 import InputPlaceHolder from "../Input/InputPlaceHolder";
 import MapModal from "../Map/Map";
-import axios from "axios";
+import api from "../../utils/api";
 const Header = (props) => {
   const navigate = useNavigate();
   const [isHidden, setIsHidden] = useState(false);
@@ -44,7 +44,7 @@ const Header = (props) => {
 
   useEffect(() => {
     const resp = async()=>{
-      const isAdminResponce = await axios.get(`http://localhost:3000/users/${localStorage.getItem('user')}`);
+      const isAdminResponce = await api.get(`/users/${localStorage.getItem('user')}`);
       if (isAdminResponce.data.role === 'admin') {
         setIsAdmin(true)
       }

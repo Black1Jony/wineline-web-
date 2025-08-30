@@ -14,7 +14,7 @@ import { useFilterStore } from "../../../utils/store/filterstore";
 import { useCountStore } from "../../../utils/store/countTovarsstore";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import api from "../../../utils/api";
 import s from "./catalogtovars.module.css";
 import getFiltersFromServer from "../filter/filters";
 
@@ -64,7 +64,7 @@ const CatalogTovars = ({ type }) => {
     const getCatalog = async () => {
       setLoading(true);
       try {
-        const resp = await axios.get(`http://localhost:3000/catalog/${type}`, {
+        const resp = await api.get(`/catalog/${type}`, {
           params: { ...filters, page },
         });
         setCatalog((prev) =>

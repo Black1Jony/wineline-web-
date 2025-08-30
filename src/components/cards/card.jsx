@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { getinfo } from "./cardgetData";
 import { useCountStore } from "../../utils/store/countTovarsstore";
 import { shopStore } from "../../utils/store/shopStore";
-import axios from "axios";
+import api from "../../utils/api";
 import { hiddenStore } from "../../utils/store/hiddenStore";
 
 import { favoriteStore } from "../../utils/store/favoriteStore";
@@ -61,13 +61,13 @@ const Card = ({ data, showDelete = false, onDelete }) => {
     try {
       if (newLikedState) {
         addFavorite(data.id);
-        await axios.post(`http://localhost:3000/favorite/${currentUse}`, {
+        await api.post(`/favorite/${currentUse}`, {
           id: data.id,
         });
         messageApi.open({ type: "success", content: "Добавлено в избранное" });
       } else {
         removeFavorite(data.id);
-        await axios.delete(`http://localhost:3000/favorite/${currentUse}`, {
+        await api.delete(`/favorite/${currentUse}`, {
           data: { id: data.id },
         });
         messageApi.open({ type: "success", content: "Удалено из избранного" });
@@ -112,8 +112,8 @@ const Card = ({ data, showDelete = false, onDelete }) => {
               className="absolute top-2 left-2 cursor-pointer text-red-500 font-bold text-xl z-10"
               onClick={async () => {
                 removeProduct(data.id);
-                await axios.delete(
-                  `http://localhost:3000/shop/${currentUse}/${data.id}`
+                await api.delete(
+                  `/shop/${currentUse}/${data.id}`
                 );
                 messageApi.open({ type: "success", content: "Товар удалён" });
               }}
@@ -207,8 +207,8 @@ const Card = ({ data, showDelete = false, onDelete }) => {
                         count: 1,
                         price: data?.price?.meta,
                       });
-                      await axios.post(
-                        `http://localhost:3000/shop/${currentUse}/add`,
+                      await api.post(
+                        `/shop/${currentUse}/add`,
                         { product: data.id, count: 1 }
                       );
                     }}
@@ -223,14 +223,14 @@ const Card = ({ data, showDelete = false, onDelete }) => {
                       onClick={async () => {
                         if (currentProduct.count > 1) {
                           productMinus(data.id);
-                          await axios.post(
-                            `http://localhost:3000/shop/${currentUse}/minus`,
+                          await api.post(
+                            `/shop/${currentUse}/minus`,
                             { product: data.id }
                           );
                         } else {
                           removeProduct(data.id);
-                          await axios.delete(
-                            `http://localhost:3000/shop/${currentUse}/${data.id}`
+                          await api.delete(
+                            `/shop/${currentUse}/${data.id}`
                           );
                           messageApi.open({
                             type: "success",
@@ -245,8 +245,8 @@ const Card = ({ data, showDelete = false, onDelete }) => {
                     <div
                       onClick={async () => {
                         productPlus(data.id);
-                        await axios.post(
-                          `http://localhost:3000/shop/${currentUse}/plus`,
+                        await api.post(
+                          `/shop/${currentUse}/plus`,
                           { product: data.id }
                         );
                       }}
