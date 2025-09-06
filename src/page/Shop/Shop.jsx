@@ -2,12 +2,15 @@ import { useRef, useState, useEffect } from "react";
 import api from "../../utils/api";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import MobileFooter from "../../components/Footer/MobileFooter";
 import MainShop from "../../components/ShopComponent/MainShop";
 import BuyingShop from "../../components/ShopComponent/BuyingShop";
 import BuyingShopNoScroll from "../../components/ShopComponent/BuyingShopNoScroll";
 import { shopStore } from "../../utils/store/shopStore";
+import { useNavigate } from "react-router-dom";
 
 const Shop = () => {
+  const navigate = useNavigate();
   const productsStore = shopStore((state) => state.products);
   const [shop, setShop] = useState(null);
   const user = localStorage.getItem("user");
@@ -16,7 +19,7 @@ const Shop = () => {
 
   const productsRef = useRef(null);
   const paymentRef = useRef(null);
-  if (!localStorage.getItem("user")) window.location.pathname = "/";
+  if (!localStorage.getItem("user")) navigate("/");
   useEffect(() => {
     if (!user) return;
 
@@ -51,8 +54,9 @@ const Shop = () => {
 
   return (
     <>
-      <Header show={true} />
-      <div className="min-h-full w-full bg-[#f5f5f5] flex justify-center items-center px-3 md:px-6">
+      <div className="pb-20 md:pb-0">
+        <Header show={true} />
+        <div className="min-h-full w-full bg-[#f5f5f5] flex justify-center items-center px-3 md:px-6">
         {Array.isArray(shop) && shop.length > 0 && productsStore.length > 0 ? (
           <div className="!mt-[40vh] w-full lg:w-[80%] flex flex-col md:flex-row gap-6 md:gap-10 lg:gap-12 mb-25 relative ">
             <div className="flex-1 min-w-full md:min-w-[60%] relative">
@@ -94,7 +98,7 @@ const Shop = () => {
             </div>
             <button
               onClick={() => {
-                window.location.pathname = '/';
+                navigate('/');
               }}
               className={`bg-[#1b1b1b] w-full h-14 rounded-2xl p-3 !text-white font-Arial transition-all hover:bg-[#e06969]`}
             >
@@ -102,8 +106,10 @@ const Shop = () => {
             </button>
           </div>
         )}
+        </div>
       </div>
       <Footer />
+      <MobileFooter />
     </>
   );
 };

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Card from "../../components/cards/card";
 import Footer from "../../components/Footer/Footer";
+import MobileFooter from "../../components/Footer/MobileFooter";
 import api from "../../utils/api";
 
 const SearchPage = () => {
@@ -78,9 +79,10 @@ const SearchPage = () => {
 
   return (
     <>
-      <Header />
+      <div className="pb-20 md:pb-0">
+        <Header />
 
-      {searchResults.length > 0 ? (
+        {searchResults.length > 0 ? (
         <div className="flex flex-col w-[92%] p-4 gap-4 mt-[20vh] justify-self-center self-center">
           <div className="flex justify-between items-center">
             <h1 className="font-Arial text-3xl !font-semibold">
@@ -122,9 +124,11 @@ const SearchPage = () => {
             Вернуться в Каталог
           </button>
         </div>
-      )}
+        )}
 
-      <Footer />
+        <Footer />
+      </div>
+      <MobileFooter />
     </>
   );
 };

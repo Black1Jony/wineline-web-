@@ -18,16 +18,19 @@ import BuyCertificate from "../../../components/MainPageComponets/BuyCertificate
 import OurBrends from "../../../components/MainPageComponets/OurBrends/OurBrends.jsx";
 import OurPlusTwo from "../../../components/MainPageComponets/OurPlus/OurPlusTwo.jsx";
 import Footer from "../../../components/Footer/Footer.jsx";
+import MobileFooter from "../../../components/Footer/MobileFooter.jsx";
+import { useNavigate } from "react-router-dom";
 const MainPage = () => {
+  const navigate = useNavigate();
   return (
     <>
-      <div className="relative">
+      <div className="relative pb-20 md:pb-0">
         <Header />
 
-        <div className="w-[100%] md:w-full px-4 sm:px-8 md:px-12 xl:px-16 mt-40 mb-8 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-start">
+        <div className="w-[100%] md:w-full px-4 sm:px-8 md:px-12 xl:px-16 mt-40 mb-8 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-stretch">
           <SwiperWine />
 
-          <div className="hidden xl:flex flex-col gap-6">
+          <div className="hidden xl:flex flex-col gap-6 justify-center">
             <Promotion
               promotion={{
                 image: "/assets/logos/italia.png",
@@ -46,7 +49,7 @@ const MainPage = () => {
             />
             <button
               className="w-full h-12 rounded-2xl bg-[#c4c3c3] text-sm"
-              onClick={() => (window.location.pathname = "catalog/wine")}
+              onClick={() => navigate("catalog/wine")}
             >
               Каталог Вина
             </button>
@@ -71,6 +74,7 @@ const MainPage = () => {
         <OurPlusTwo />
         <Footer />
       </div>
+      <MobileFooter />
       <FloatButton.BackTop />
     </>
   );

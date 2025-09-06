@@ -26,6 +26,8 @@ const BannerCategory = ({ type }) => {
     ? banner.image
     : `${banner.image}`;
 
+  const isGift = type === "gift";
+
   return (
     <section
       className={`relative transition-all duration-500 ${
@@ -34,15 +36,34 @@ const BannerCategory = ({ type }) => {
     >
       {!hideBanner && (
         <div
-          className={`w-full min-h-[360px] bg-no-repeat bg-right bg-contain flex px-6 md:px-20 py-6 items-center mt-10 ${s.responsiveBanner}`}
-          style={{ backgroundImage: `url(${bgImage})` }}
+          className={`w-full min-h-[360px] bg-no-repeat bg-right bg-cover flex px-6 md:px-20 py-6 items-center mt-10 rounded-2xl overflow-hidden ${s.responsiveBanner}`}
+          style={{
+            backgroundImage: `url(${bgImage})`,
+          }}
         >
-          <div className="w-full md:w-[65%] flex flex-col">
-            <h1 className="text-[32px] md:text-[42px] text-white font-bold">
+          {/* затемняющая подложка для читаемости текста */}
+          {isGift && (
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+          )}
+
+          <div className="w-full md:w-[65%] flex flex-col relative z-10">
+            <h1
+              className={`font-bold ${
+                isGift
+                  ? "text-4xl md:text-5xl text-yellow-200 drop-shadow-lg"
+                  : "text-[32px] md:text-[42px] text-white"
+              }`}
+            >
               {banner.title}
             </h1>
             {banner.description && (
-              <p className="text-[16px] md:text-[20px] text-white font-medium mt-3 hidden lg:block">
+              <p
+                className={`mt-3 ${
+                  isGift
+                    ? "text-lg md:text-xl text-white/90 font-medium"
+                    : "text-[16px] md:text-[20px] text-white font-medium hidden lg:block"
+                }`}
+              >
                 {banner.description}
               </p>
             )}
@@ -50,7 +71,11 @@ const BannerCategory = ({ type }) => {
         </div>
       )}
       {hideBanner && (
-        <h2 className="absolute top-0 left-6 text-white font-bold text-xl">
+        <h2
+          className={`absolute top-0 left-6 font-bold text-xl ${
+            isGift ? "text-yellow-200 drop-shadow" : "text-white"
+          }`}
+        >
           {banner.title}
         </h2>
       )}

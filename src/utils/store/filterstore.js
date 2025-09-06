@@ -3,6 +3,7 @@ import { create } from "zustand";
 export const useFilterStore = create((set, get) => ({
   type: "wine",
   filters: {},
+  sortBy: "default",
 
   setType: (type) => set({ type }),
 
@@ -16,5 +17,7 @@ export const useFilterStore = create((set, get) => ({
     });
   },
 
-  resetFilters: () => set({ filters: {} }),
+  setSortBy: (sortBy) => set({ sortBy }),
+
+  resetFilters: () => set({ filters: {}, sortBy: "default" }),
 }));

@@ -12,6 +12,7 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import Footer from "../../components/Footer/Footer";
+import MobileFooter from "../../components/Footer/MobileFooter";
 
 const CardPage = () => {
   const [open, setOpen] = useState(false);
@@ -46,10 +47,9 @@ const CardPage = () => {
     }
 
     try {
-      const code = `${certificateName}-${Date.now()}`;
 
       const response = await api.post("/card", {
-        code,
+        code: certificateName, // просто название
         amount: value,
         infinite: false,
         userId,
@@ -61,7 +61,6 @@ const CardPage = () => {
         `Сертификат "${certificateName}" на ${value} успешно создан!`
       );
 
-      // Закрываем модалку и очищаем поля
       setOpen(false);
       setCertificateName("");
       setCardData({ number: "", name: "", expiry: "", cvc: "", focus: "" });
@@ -79,8 +78,9 @@ const CardPage = () => {
   return (
     <>
       {contextHolder}
-      <Header show={true} />
-      <CardBanner onBuyClick={() => setOpen(true)} />
+      <div className="pb-20 md:pb-0">
+        <Header show={true} />
+        <CardBanner onBuyClick={() => setOpen(true)} />
 
       {/* Гайд / Информационные карточки */}
       <div className="max-w-6xl mx-auto mt-12 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 px-4">
@@ -119,9 +119,10 @@ const CardPage = () => {
             момента покупки.
           </p>
         </div>
+        </div>
       </div>
       <Footer/>
-      {/* Модалка */}
+      <MobileFooter />
       <Modal
         open={open}
         footer={null}

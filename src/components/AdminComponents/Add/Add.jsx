@@ -194,9 +194,7 @@ const Add = () => {
               onChange={(value) =>
                 setAllData({
                   ...alldata,
-                  price: value
-                    ? { current: `${value} ₽`, meta: value.toString() }
-                    : null,
+                  price: { current: `${value} ₽`, meta: value.toString() }
                 })
               }
               className="!w-full sm:!w-3/5 lg:!w-2/5"

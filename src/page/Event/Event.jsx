@@ -5,8 +5,8 @@ import dayjs from "dayjs";
 import "dayjs/locale/ru.js";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import MobileFooter from "../../components/Footer/MobileFooter";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { motion } from "framer-motion";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -112,9 +112,10 @@ const Event = () => {
   return (
     <>
       {contextHolder}
-      <Header />
+      <div className="pb-20 md:pb-0">
+        <Header />
 
-      <div className="mt-[170px] flex flex-col gap-8 justify-center items-center w-full px-4 md:px-0">
+        <div className="mt-[170px] flex flex-col gap-8 justify-center items-center w-full px-4 md:px-0">
         <h2 className="text-gray-600 text-lg md:text-xl text-center max-w-3xl">
           Главная - Мероприятия с дегустацией -{" "}
           <span className="font-semibold">
@@ -295,7 +296,9 @@ const Event = () => {
         </div>
       </Modal>
 
-      <Footer />
+        <Footer />
+      </div>
+      <MobileFooter />
     </>
   );
 };

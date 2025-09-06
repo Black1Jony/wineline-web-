@@ -9,11 +9,12 @@ import {
   Radio,
   Row,
   Col,
+  Select,
+  Button,
 } from "antd";
 import { useFilterStore } from "../../../utils/store/filterstore";
 import { useCountStore } from "../../../utils/store/countTovarsstore";
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 import api from "../../../utils/api";
 import s from "./catalogtovars.module.css";
 import getFiltersFromServer from "../filter/filters";
@@ -21,8 +22,17 @@ import getFiltersFromServer from "../filter/filters";
 const { Panel } = Collapse;
 
 const CatalogTovars = ({ type }) => {
-  const { filters, setFilter, setType, resetFilters } = useFilterStore();
+  const { filters, setFilter, setType, resetFilters, sortBy, setSortBy } = useFilterStore();
   const { count, setCount } = useCountStore();
+
+  // Опции сортировки
+  const sortOptions = [
+    { value: "default", label: "По умолчанию" },
+    { value: "priceAsc", label: "Цена: по возрастанию" },
+    { value: "priceDesc", label: "Цена: по убыванию" },
+    { value: "ratingDesc", label: "Рейтинг: по убыванию" },
+    { value: "ratingAsc", label: "Рейтинг: по возрастанию" }
+  ];
 
   const [catalog, setCatalog] = useState([]);
   const [page, setPage] = useState(1);
@@ -51,13 +61,13 @@ const CatalogTovars = ({ type }) => {
       setNowFilter(filterData);
     };
     fetchFilters();
-  }, [type]);
+  }, [type, setType, resetFilters]);
 
-  // Сброс при смене фильтров
+  // Сброс при смене фильтров или сортировки
   useEffect(() => {
     setPage(1);
     setCatalog([]);
-  }, [filters, type]);
+  }, [filters, sortBy, type]);
 
   // Получение товаров
   useEffect(() => {
@@ -65,7 +75,7 @@ const CatalogTovars = ({ type }) => {
       setLoading(true);
       try {
         const resp = await api.get(`/catalog/${type}`, {
-          params: { ...filters, page },
+          params: { ...filters, sortBy, page },
         });
         setCatalog((prev) =>
           page === 1 ? resp.data.data : [...prev, ...resp.data.data]
@@ -78,19 +88,19 @@ const CatalogTovars = ({ type }) => {
       }
     };
     getCatalog();
-  }, [type, filters, page, setCount]);
+  }, [type, filters, sortBy, page, setCount]);
 
   // Бесконечный скролл
-  const scrollHandler = () => {
-    if (loading || page >= Math.ceil(count / 24)) return;
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    if (rect.bottom - window.innerHeight < 100) {
-      setPage((prev) => prev + 1);
-    }
-  };
-
   useEffect(() => {
+    const scrollHandler = () => {
+      if (loading || page >= Math.ceil(count / 24)) return;
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      if (rect.bottom - window.innerHeight < 100) {
+        setPage((prev) => prev + 1);
+      }
+    };
+
     window.addEventListener("scroll", scrollHandler);
     return () => window.removeEventListener("scroll", scrollHandler);
   }, [loading, page, count]);
@@ -179,7 +189,7 @@ const CatalogTovars = ({ type }) => {
             <Collapse ghost key={idx}>
               <Panel header={f.label} key={idx}>
                 <Checkbox.Group
-                  value={[selectedValues[f.name]] || []}
+                  value={selectedValues[f.name] ? [selectedValues[f.name]] : []}
                   onChange={(vals) =>
                     handleCheckboxChange(f.name, vals[vals.length - 1])
                   }
@@ -196,14 +206,17 @@ const CatalogTovars = ({ type }) => {
         </Drawer>
       </div>
 
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className={`text-[#5e5c5c] ${s.Arial}`}>{count} товары</h3>
-        <div className="w-[15%] hidden md:block">
-          <select onChange={(e) => setFilter("sortBy", e.target.value)}>
-            <option>Сортировка</option>
-            <option value="priceAsc">сначала дороже</option>
-            <option value="priceDesc">сначала подешевле</option>
-          </select>
+        <div className="w-full sm:w-64">
+          <Select
+            value={sortBy}
+            onChange={setSortBy}
+            options={sortOptions}
+            placeholder="Сортировка"
+            className="w-full"
+            size="large"
+          />
         </div>
       </div>
 

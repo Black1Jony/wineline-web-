@@ -4,10 +4,11 @@ import BannerCategory from "../../components/KatalogComponents/Banner/BannerCate
 import Filter from "../../components/KatalogComponents/filter/Filter";
 import Card from "../../components/cards/card";
 import Footer from "../../components/Footer/Footer";
+import MobileFooter from "../../components/Footer/MobileFooter";
 import OurPlusTwo from "../../components/MainPageComponets/OurPlus/OurPlusTwo";
 import { useState, useEffect, useRef } from "react";
-import { Pagination, Button } from "antd";
-import { motion, useInView } from "framer-motion";
+import { Pagination, Button, Select } from "antd";
+import { useInView } from "framer-motion";
 import { MenuOutlined } from "@ant-design/icons";
 import api from "../../utils/api";
 import { useFilterStore } from "../../utils/store/filterstore";
@@ -21,22 +22,37 @@ const AnimatedCard = ({ data }) => {
 
   if (hiddenProduct.includes(data.id)) return null;
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      whileHover={{ scale: 1.05 }}
+      className={`transition-all duration-600 ease-out hover:scale-105 ${
+        isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+      }`}
     >
       <Card data={data} />
-    </motion.div>
+    </div>
   );
 };
 
 const Katolog = () => {
   const { type } = useParams();
-  const { filters } = useFilterStore();
+  const { filters, sortBy, setSortBy } = useFilterStore();
   const { count, setCount } = useCountStore();
+
+  // Опции сортировки
+  const sortOptions = [
+    { value: "default", label: "По умолчанию" },
+    { value: "priceAsc", label: "Цена: по возрастанию" },
+    { value: "priceDesc", label: "Цена: по убыванию" },
+    { value: "ratingDesc", label: "Рейтинг: по убыванию" },
+    { value: "ratingAsc", label: "Рейтинг: по возрастанию" },
+    { value: "nameAsc", label: "Название: А-Я" },
+    { value: "nameDesc", label: "Название: Я-А" },
+    { value: "newest", label: "Сначала новые" },
+    { value: "oldest", label: "Сначала старые" },
+    { value: "popular", label: "Популярные" },
+    { value: "discount", label: "Скидки" },
+    { value: "alphabetical", label: "Алфавитный порядок" },
+  ];
 
   const [catalog, setCatalog] = useState([]);
   const [page, setPage] = useState(1);
@@ -45,12 +61,12 @@ const Katolog = () => {
 
   const containerRef = useRef(null);
 
-  // Сброс при смене фильтров или типа
+  // Сброс при смене фильтров, сортировки или типа
   useEffect(() => {
     window.scrollTo(0, 0)
     setPage(1);
     setCatalog([]);
-  }, [filters, type]);
+  }, [filters, sortBy, type]);
 
   // Получение товаров
   useEffect(() => {
@@ -58,7 +74,7 @@ const Katolog = () => {
       setLoading(true);
       try {
         const resp = await api.get(`/catalog/${type}`, {
-          params: { ...filters, page },
+          params: { ...filters, sortBy, page },
         });
         setCatalog((prev) =>
           page === 1 ? resp.data.data : [...prev, ...resp.data.data]
@@ -71,27 +87,28 @@ const Katolog = () => {
       }
     };
     getCatalog();
-  }, [type, filters, page, setCount]);
+  }, [type, filters, sortBy, page, setCount]);
 
   // Бесконечный скролл
-  const scrollHandler = () => {
-    if (loading || page >= Math.ceil(count / 24)) return;
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    if (rect.bottom - window.innerHeight < 100) {
-      setPage((prev) => prev + 1);
-    }
-  };
-
   useEffect(() => {
+    const scrollHandler = () => {
+      if (loading || page >= Math.ceil(count / 24)) return;
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      if (rect.bottom - window.innerHeight < 100) {
+        setPage((prev) => prev + 1);
+      }
+    };
+
     window.addEventListener("scroll", scrollHandler);
     return () => window.removeEventListener("scroll", scrollHandler);
   }, [loading, page, count]);
 
   return (
     <>
-      <Header />
-      <BannerCategory type={type} />
+      <div className="pb-20 md:pb-0">
+        <Header />
+        <BannerCategory type={type} />
 
       <main className="w-[94%] mx-auto grid gap-12 relative lg:grid-cols-[1fr_2.8fr]">
         {/* Фильтры на планшетах и десктопе */}
@@ -100,39 +117,43 @@ const Katolog = () => {
         </div>
 
         <div ref={containerRef}>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <h3 className="text-[#5e5c5c]">{count} товаров</h3>
 
-            {/* Кнопка + фильтры только на мобильных (<768px) */}
-            <div className="block md:hidden">
-              <Button
-                icon={<MenuOutlined />}
-                onClick={() => setShowFiltersMobile((prev) => !prev)}
-              >
-                Фильтры
-              </Button>
-              {showFiltersMobile && (
-                <div className="mt-4">
-                  <Filter type={type} />
-                </div>
-              )}
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              {/* Селектор сортировки */}
+              <Select
+                value={sortBy}
+                onChange={setSortBy}
+                options={sortOptions}
+                placeholder="Сортировка"
+                className="w-full sm:w-64"
+                size="large"
+              />
+
+              {/* Кнопка + фильтры только на мобильных (<768px) */}
+              <div className="block md:hidden">
+                <Button
+                  icon={<MenuOutlined />}
+                  onClick={() => setShowFiltersMobile((prev) => !prev)}
+                >
+                  Фильтры
+                </Button>
+                {showFiltersMobile && (
+                  <div className="mt-4">
+                    <Filter type={type} />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Сетка карточек */}
-          <motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-8"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.05 } },
-            }}
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-8">
             {catalog.map((item) => (
               <AnimatedCard key={item.id} data={item} />
             ))}
-          </motion.div>
+          </div>
 
           {loading && <div className="text-center mt-4">Загрузка...</div>}
 
@@ -155,8 +176,10 @@ const Katolog = () => {
         </div>
       </main>
 
-      <OurPlusTwo />
-      <Footer />
+        <OurPlusTwo />
+        <Footer />
+      </div>
+      <MobileFooter />
     </>
   );
 };

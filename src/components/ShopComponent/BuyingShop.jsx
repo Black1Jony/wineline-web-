@@ -5,7 +5,7 @@ import { Modal, Input, Button, message as antdMessage } from "antd";
 import Cards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
 
-const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
+const BuyingShop = ({ price, count, refProp, isScrollable }) => {
   const deleteAll = shopStore((state) => state.clearProducts);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -117,22 +117,72 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
       };
       const response = await api.post("/card", payload);
 
-      messageApi.success(
-        `Покупка успешно оформлена! Код: ${response.data.code}`
-      );
+      // Начисляем баллы за покупку
+      try {
+        await api.post("/user/score", { 
+          id: localStorage.getItem("user"), 
+          amount: Number(amount) 
+        });
+        
+        // Получаем обновленное количество баллов
+        const userResp = await api.get(`/users/${localStorage.getItem("user")}`);
+        const newScore = userResp.data?.score || 0;
+        
+        messageApi.success(
+          `Покупка успешно оформлена! Код: ${response.data.code}. Начислено баллов: ${Math.round(Number(amount) / 25)}. Всего баллов: ${newScore}`
+        );
+        
+        // Показываем уведомление о доставке сразу
+        messageApi.success({
+          content: (
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🚚</span>
+              <div>
+                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
+              </div>
+            </div>
+          ),
+          duration: 8,
+        });
+      } catch (scoreErr) {
+        messageApi.warning("Покупка прошла успешно, но не удалось начислить баллы");
+        console.error("Score update error:", scoreErr);
+        
+        // Показываем уведомление о доставке даже если не удалось начислить баллы
+        messageApi.success({
+          content: (
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🚚</span>
+              <div>
+                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
+              </div>
+            </div>
+          ),
+          duration: 8,
+        });
+      }
 
       // Очистка корзины сразу
       deleteAll();
       localStorage.removeItem("shop-storage");
       await api.delete(`/shop/${localStorage.getItem("user")}`);
 
-      setModalOpen(false);
-      setCardData({ number: "", name: "", expiry: "", cvc: "", focus: "" });
-      setPromoCode("");
-      setAppliedPromo(null);
-      setDiscount(0);
-      setAmount(0);
-      messageApi.success("Покупка прошла успешна");
+      // Закрываем модалку с задержкой, чтобы уведомление успело показаться
+      setTimeout(() => {
+        setModalOpen(false);
+        setCardData({ number: "", name: "", expiry: "", cvc: "", focus: "" });
+        setPromoCode("");
+        setAppliedPromo(null);
+        setDiscount(0);
+        setAmount(0);
+      }, 2000);
+      
+      // Обновляем количество баллов пользователя
+      const userResp = await api.get(`/users/${localStorage.getItem("user")}`);
+      setUserScore(userResp.data?.score || 0);
+      
     } catch (err) {
       messageApi.error(
         "Ошибка при оформлении: " + (err.response?.data?.error || err.message)
@@ -150,20 +200,53 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
       messageApi.warning("Недостаточно баллов");
       return;
     }
+    if (userScore < Number(amount)) {
+      messageApi.warning(`Недостаточно баллов. Доступно: ${userScore}, требуется: ${Number(amount)}`);
+      return;
+    }
     setIsPayingWithPoints(true);
     try {
       if (!(Number(amount) > 0)) {
         messageApi.error("Сумма должна быть положительной");
         return;
       }
-      await api.post(`/user/score`, { id: uid, amount: Number(amount) });
-      messageApi.success("Оплата баллами прошла успешно!");
+      
+      // Списываем баллы через специальный эндпоинт
+      await api.post(`/user/score/minus`, { id: uid, amount: Number(amount) });
+      
+      // Получаем обновленное количество баллов
+      const userResp = await api.get(`/users/${uid}`);
+      const newScore = userResp.data?.score || 0;
+      
+      messageApi.success(`Оплата баллами прошла успешно! Потрачено баллов: ${Number(amount)}. Остаток: ${newScore}`);
 
+      // Показываем уведомление о доставке
+      setTimeout(() => {
+        messageApi.success({
+          content: (
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🚚</span>
+              <div>
+                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
+              </div>
+            </div>
+          ),
+          duration: 8,
+        });
+      }, 1000);
+
+      // Очистка корзины
       deleteAll();
       localStorage.removeItem("shop-storage");
+      await api.delete(`/shop/${uid}`);
+      
+      // Обновляем количество баллов
+      setUserScore(newScore);
+      
     } catch (err) {
       messageApi.error(
-        err?.response?.data?.error || "Ошибка при оплате баллами"
+        err?.response?.data?.message || "Ошибка при оплате баллами"
       );
     } finally {
       setIsPayingWithPoints(false);
@@ -199,9 +282,9 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
   }, []);
 
   return (
-    isVisible && (
-      <>
-        {contextHolder}
+    <>
+      {contextHolder /* Ensure contextHolder is rendered at the top level */}
+      {isVisible && (
         <div
           ref={refProp}
           className={`w-full flex flex-col gap-3 bg-white h-auto md:h-[450px] rounded-2xl p-4 md:flex ${
@@ -213,7 +296,7 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
             className="text-2xl font-Arial !font-semibold text-[#c2c2c2] cursor-pointer"
             onClick={async() => {
               deleteAll();
-              api.delete(`/shop/${localStorage.getItem('user')}`)
+              await api.delete(`/shop/${localStorage.getItem('user')}`)
               localStorage.removeItem("shop-storage");
               messageApi.success("Корзина очищена!");
             }}
@@ -266,11 +349,21 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
           {/* Оплата баллами */}
           {userScore > 0 && (
             <Button
-              disabled={isPayingWithPoints || amount <= 0}
-              className="flex justify-center items-center w-full rounded-2xl bg-[#8a2be2] !font-Arial text-xl text-white"
+              disabled={isPayingWithPoints || amount <= 0 || userScore < Number(amount)}
+              className={`flex justify-center items-center w-full rounded-2xl !font-Arial text-xl text-white ${
+                userScore >= Number(amount) && Number(amount) > 0 
+                  ? "bg-[#8a2be2] hover:bg-[#7a1be2]" 
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
               onClick={handlePayWithPoints}
             >
-              Оплатить баллами (доступно: {userScore})
+              {isPayingWithPoints ? (
+                "Обработка..."
+              ) : userScore < Number(amount) ? (
+                `Недостаточно баллов (${userScore}/${Number(amount)})`
+              ) : (
+                `Оплатить баллами (${userScore} баллов)`
+              )}
             </Button>
           )}
 
@@ -282,73 +375,73 @@ const BuyingShop = ({ price, count, refProp, productsRef, isScrollable }) => {
             Купить
           </Button>
         </div>
+      )}
 
-        {/* Модальное окно оплаты */}
-        <Modal
-          open={modalOpen}
-          footer={null}
-          onCancel={() => setModalOpen(false)}
-          centered
-          className="!p-0"
-          title="Данные для оплаты"
-        >
-          <div className="text-center p-6 flex flex-col gap-4">
-            <Cards
-              number={cardData.number}
-              name={cardData.name}
-              expiry={cardData.expiry}
-              cvc={cardData.cvc}
-              focused={cardData.focus}
-            />
+      {/* Render modal */}
+      <Modal
+        open={modalOpen}
+        footer={null}
+        onCancel={() => setModalOpen(false)}
+        centered
+        className="!p-0"
+        title="Данные для оплаты"
+      >
+        <div className="text-center p-6 flex flex-col gap-4">
+          <Cards
+            number={cardData.number}
+            name={cardData.name}
+            expiry={cardData.expiry}
+            cvc={cardData.cvc}
+            focused={cardData.focus}
+          />
 
+          <Input
+            type="tel"
+            name="number"
+            placeholder="Номер карты"
+            value={cardData.number}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            className="mb-3"
+          />
+          <Input
+            type="text"
+            name="name"
+            placeholder="Имя владельца"
+            value={cardData.name}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            className="mb-3"
+          />
+          <div className="flex gap-2 mb-4">
             <Input
-              type="tel"
-              name="number"
-              placeholder="Номер карты"
-              value={cardData.number}
+              type="text"
+              name="expiry"
+              placeholder="MM/YY"
+              value={cardData.expiry}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
-              className="mb-3"
             />
             <Input
               type="text"
-              name="name"
-              placeholder="Имя владельца"
-              value={cardData.name}
+              name="cvc"
+              placeholder="CVC"
+              value={cardData.cvc}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
-              className="mb-3"
             />
-            <div className="flex gap-2 mb-4">
-              <Input
-                type="text"
-                name="expiry"
-                placeholder="MM/YY"
-                value={cardData.expiry}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-              />
-              <Input
-                type="text"
-                name="cvc"
-                placeholder="CVC"
-                value={cardData.cvc}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-              />
-            </div>
-
-            <Button
-              type="primary"
-              onClick={handleBuy}
-              className="bg-green-600 text-white rounded-xl"
-            >
-              Оплатить
-            </Button>
           </div>
-        </Modal>
-      </>
-    )
+
+          <Button
+            type="primary"
+            onClick={handleBuy}
+            className="bg-green-600 text-white rounded-xl"
+          >
+            Оплатить
+          </Button>
+        </div>
+      </Modal>
+    </>
   );
 };
 

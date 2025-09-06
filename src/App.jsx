@@ -16,8 +16,9 @@ import EventPage from "./page/EventPage/eventPage";
 import Event from "./page/Event/Event";
 import CardPage from "./page/Cards.jsx/CardPage";
 import Profile from "./page/profile/Profile";
-
+import { message } from "antd";
 function App() {
+  const [messageApi, contextHolder] = message.useMessage();
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (!user) return;
@@ -28,31 +29,32 @@ function App() {
         const shopData = resp.data.shop || [];
         const favoriteData = resp.data.favorites || [];
 
-        // Debugging logs to ensure data is fetched correctly
-        console.log("Fetched shop data:", shopData);
-        console.log("Fetched favorite data:", favoriteData);
+       
 
-        // Update Zustand stores
-        shopStore.getState().setProduct([...shopData]); // Ensure a new array is passed
-        favoriteStore.getState().setFavorite([...favoriteData]); // Ensure a new array is passed
+        shopStore.getState().setProduct([...shopData]); 
+        favoriteStore.getState().setFavorite([...favoriteData]); 
       } catch (err) {
         if (err.response?.status === 404) {
           shopStore.getState().clearProducts();
           favoriteStore.getState().clearFavorite();
           localStorage.removeItem("user");
           localStorage.removeItem("jwt");
-          window.location.reload(); // Use location.reload() instead of window.reload()
+          window.location.reload(); 
         }
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
+    const interval = setInterval(fetchData, 9000); 
     return () => clearInterval(interval);
   }, []);
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
 
   return (
     <>
+      {contextHolder}
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/login" element={<LoginPage />} />

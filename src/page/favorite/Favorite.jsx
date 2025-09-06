@@ -4,11 +4,12 @@ import Card from "../../components/cards/card"
 import { favoriteStore } from "../../utils/store/favoriteStore"
 import { useState, useEffect } from "react"
 import Footer from "../../components/Footer/Footer"
+import MobileFooter from "../../components/Footer/MobileFooter"
 import { useNavigate } from "react-router-dom"
 const Favorite = () => {
     const navigate = useNavigate()
 const favorite = favoriteStore((state) => state.favorites);
-if(!localStorage.getItem('user')) window.location.pathname = '/'
+if(!localStorage.getItem('user')) navigate('/')
     const [favorites, setFavorites] = useState([])
     useEffect(() => {
             if (favorite.length === 0) {
@@ -36,8 +37,9 @@ if(!localStorage.getItem('user')) window.location.pathname = '/'
     
   return (
     <>
-      <Header />
-      {favorite.length >= 1 && (
+      <div className="pb-20 md:pb-0">
+        <Header />
+        {favorite.length >= 1 && (
         <div className="flex flex-col gap-4 mt-[30vh] w-[92%] justify-center self-center justify-self-center">
           <div className="flex !justify-between w-full font-Arial ">
             <div>
@@ -84,8 +86,10 @@ if(!localStorage.getItem('user')) window.location.pathname = '/'
             Вернуться на Главную
           </button>
         </div>
-      )}
-      <Footer />
+        )}
+        <Footer />
+      </div>
+      <MobileFooter />
     </>
   );
 }

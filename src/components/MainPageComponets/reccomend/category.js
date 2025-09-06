@@ -19,9 +19,9 @@ export const category = [
   },
   {
     id: 4,
-    name: "топ рейтинг",
+    name: "Испанское",
     image: "/assets/bottles/popular 1.svg",
-    path: "/catalog/top",
+    path: "/search/country=Испания",
   },
   {
     id: 5,
@@ -37,9 +37,9 @@ export const category = [
   },
   {
     id: 7,
-    name: "бокалы",
+    name: "Дегустации",
     image: "/assets/bottles/steklo.svg",
-    path: "/catalog/glasses",
+    path: "/event",
   },
   {
     id: 8,
@@ -51,7 +51,7 @@ export const category = [
     id: 9,
     name: "подарочные сертификаты",
     image: "/assets/bottles/cards 1.svg",
-    path: '/cards'
+    path: "/cards",
   },
   {
     id: 10,

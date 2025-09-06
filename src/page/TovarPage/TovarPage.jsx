@@ -1,5 +1,5 @@
 import {  useParams } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { MotionConfig, motion as Motion } from "motion/react";
 import api from "../../utils/api";
 import Header from "../../components/Header/Header";
@@ -12,10 +12,13 @@ import Tags from "../../components/TovarComponent/infoTovar/Tags";
 import "../../components/TovarComponent/infoTovar/InfoTovarTwo.jsx";
 import InfoTovarTwo from "../../components/TovarComponent/infoTovar/InfoTovarTwo.jsx";
 import Tegi from "../../components/TovarComponent/infoTovar/Tegi/Tegi.jsx";
+import Comments from "../../components/Comments/Comments";
 import Footer from "../../components/Footer/Footer.jsx";
+import MobileFooter from "../../components/Footer/MobileFooter.jsx";
 const TovarPage = () => {
   const { id } = useParams();
   const [tovar, setTovar] = useState(null);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -23,21 +26,28 @@ const TovarPage = () => {
       try {
         const response = await api.get(`/product/${id}`);
         setTovar(response.data);
+        const initialComments = Array.isArray(response.data?.comments)
+          ? response.data.comments
+          : [];
+        setComments(initialComments);
       } catch (err) {
         console.error("Ошибка при загрузке продукта:", err);
       }
     };
-    if (id) getProduct();
+    
+    if (id) {
+      getProduct();
+    }
   }, [id]);
 
-  const category = {
+  const category = useMemo(() => ({
     Вино: "wine",
     шампанское: "shampage",
     Коньяк: "konyak",
     Виски: "whiskey",
     Вода: "voda",
     Джин: 'gin'
-  };
+  }), []);
 
   const fetchBrandItems = useCallback(
     async (params, name) => {
@@ -71,8 +81,11 @@ const TovarPage = () => {
     [
       tovar?.category,
       tovar?.characteristics?.wineCharacteristics?.Производитель,
+      category,
     ]
   );
+
+  const typeKey = category[tovar?.category];
 
   if (!tovar?.id) {
     return <div className="text-center mt-24 md:mt-28 lg:mt-32 text-lg">Загрузка товара...</div>;
@@ -84,8 +97,9 @@ const TovarPage = () => {
 
   return (
     <>
-      <Header />
-      <div>
+      <div className="pb-20 md:pb-0">
+        <Header />
+        <div>
         <Zagalovak article={tovar.article} name={tovar.fullName} />
       </div>
 
@@ -172,7 +186,18 @@ const TovarPage = () => {
         }
         first={"Другие товары этого бренда"}
       />
-      <Footer/>
+
+      {/* Комментарии */}
+      <Comments 
+        productId={tovar.id}
+        productType={typeKey}
+        comments={comments}
+        onCommentsChange={setComments}
+      />
+
+        <Footer/>
+      </div>
+      <MobileFooter />
     </>
   );
 };

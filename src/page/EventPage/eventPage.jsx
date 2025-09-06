@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../../utils/api";
 import { Card, Row, Col, DatePicker, InputNumber, Space } from "antd";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import MobileFooter from "../../components/Footer/MobileFooter";
 import dayjs from "dayjs";
 import "dayjs/locale/ru.js";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { motion } from "motion/react";
 dayjs.locale("ru");
 const { RangePicker } = DatePicker;
 
@@ -19,7 +20,7 @@ const EventPage = () => {
     maxPrice: null,
   });
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       const params = { byDate: true };
       if (filters.dateRange) {
@@ -34,11 +35,11 @@ const EventPage = () => {
     } catch (err) {
       console.error("Ошибка при загрузке событий", err);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchEvents();
-  }, [filters]);
+  }, [filters, fetchEvents]);
 
 
   const formatDate = (dateStr) => {
@@ -52,8 +53,9 @@ const EventPage = () => {
   
   return (
     <>
-      <Header />
-      <motion.div
+      <div className="pb-20 md:pb-0">
+        <Header />
+        <motion.div
         className="max-w-7xl mx-auto px-4 py-8 mt-[25vh]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -172,7 +174,7 @@ const EventPage = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                window.location.pathname = "/";
+                navigate("/");
               }}
               className="bg-[#1b1b1b] w-full h-14 rounded-2xl p-3 text-white transition-all hover:bg-[#e06969]"
             >
@@ -180,8 +182,10 @@ const EventPage = () => {
             </motion.button>
           </motion.div>
         )}
-      </motion.div>
-      <Footer />
+        </motion.div>
+        <Footer />
+      </div>
+      <MobileFooter />
     </>
   );
 };

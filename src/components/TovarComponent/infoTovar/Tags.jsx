@@ -23,6 +23,7 @@ const Line = ({ rate }) => {
 }
 
 const Tags = ({ Tags }) => {
+  if(!Tags || Tags.length < 1) return null
   return (
     <>
       <MotionConfig reducedMotion="user">
@@ -35,7 +36,7 @@ const Tags = ({ Tags }) => {
           <h1 className='text-lg sm:text-xl !font-semibold'>Вкус</h1>
           <div className="grid grid-cols-1 gap-4">
             {Tags?.map((tag, index) => (
-              <Line key={index} rate={tag.name} />
+              <Line key={index} rate={tag?.name || ''} />
             ))}
           </div>
         </Motion.div>
