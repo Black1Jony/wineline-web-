@@ -7,6 +7,7 @@ import MobileFooter from "../../components/Footer/MobileFooter";
 import dayjs from "dayjs";
 import "dayjs/locale/ru.js";
 import { useNavigate } from "react-router-dom";
+import { MotionConfig, motion as Motion } from "motion/react";
 import { motion } from "motion/react";
 dayjs.locale("ru");
 const { RangePicker } = DatePicker;

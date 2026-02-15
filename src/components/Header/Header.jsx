@@ -98,7 +98,7 @@ const Header = (props) => {
           <div className="w-full h-16 flex justify-between items-center px-4 sm:px-6 md:px-16 bg-white">
             <button className="block md:hidden p-2" onClick={toggleMobileMenu}>
               <img
-                src="/assets/svg/burger-menu-svgrepo-com.svg"
+                src="/public/assets/svg/hamburger-menu-svgrepo-com.svg"
                 alt="Menu"
                 className="w-6 h-6"
               />

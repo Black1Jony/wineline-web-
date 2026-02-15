@@ -14,7 +14,7 @@ import { Pagination, Navigation } from "swiper/modules";
 import { Modal, Input, Button, message as antdMessage } from "antd";
 import Cards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
-
+import { motion } from "motion/react";
 dayjs.locale("ru");
 
 const Event = () => {

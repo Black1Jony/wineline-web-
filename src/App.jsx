@@ -68,6 +68,7 @@ function App() {
         <Route path="/event/:id" element={<Event />} />
         <Route path="/cards" element={<CardPage/>}/>
         <Route path="/profile" element={<Profile />} />
+        
       </Routes>
     </>
   );

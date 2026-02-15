@@ -111,7 +111,11 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
       return;
     }
     if (userScore < Number(amount)) {
-      messageApi.warning(`Недостаточно баллов. Доступно: ${userScore}, требуется: ${Number(amount)}`);
+      messageApi.warning(
+        `Недостаточно баллов. Доступно: ${userScore}, требуется: ${Number(
+          amount
+        )}`
+      );
       return;
     }
     setIsPayingWithPoints(true);
@@ -120,24 +124,31 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
         messageApi.error("Сумма должна быть положительной");
         return;
       }
-      
+
       // Списываем баллы через специальный эндпоинт
       await api.post(`/user/score/minus`, { id: uid, amount: Number(amount) });
-      
+
       // Получаем обновленное количество баллов
       const userResp = await api.get(`/users/${uid}`);
       const newScore = userResp.data?.score || 0;
-      
-      messageApi.success(`Оплата баллами прошла успешно! Потрачено баллов: ${Number(amount)}. Остаток: ${newScore}`);
+
+      messageApi.success(
+        `Оплата баллами прошла успешно! Потрачено баллов: ${Number(
+          amount
+        )}. Остаток: ${newScore}`
+      );
 
       // Показываем уведомление о доставке
       setTimeout(() => {
-        messageApi.success({
+        antdMessage.open({
+          type: "success",
           content: (
             <div className="flex items-center gap-3">
               <span className="text-2xl">🚚</span>
               <div>
-                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="font-bold text-green-600">
+                  Спасибо за покупку!
+                </div>
                 <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
               </div>
             </div>
@@ -150,10 +161,9 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
       deleteAll();
       localStorage.removeItem("shop-storage");
       await api.delete(`/shop/${uid}`);
-      
+
       // Обновляем количество баллов
       setUserScore(newScore);
-      
     } catch (err) {
       messageApi.error(
         err?.response?.data?.message || "Ошибка при оплате баллами"
@@ -181,26 +191,35 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
 
       // Начисляем баллы за покупку
       try {
-        await api.post("/user/score", { 
-          id: localStorage.getItem("user"), 
-          amount: Number(amount) 
+        await api.post("/user/score", {
+          id: localStorage.getItem("user"),
+          amount: Number(amount),
         });
-        
+
         // Получаем обновленное количество баллов
-        const userResp = await api.get(`/users/${localStorage.getItem("user")}`);
-        const newScore = userResp.data?.score || 0;
-        
-        messageApi.success(
-          `Покупка успешно оформлена! Код: ${response.data.code}. Начислено баллов: ${Math.round(Number(amount) / 25)}. Всего баллов: ${newScore}`
+        const userResp = await api.get(
+          `/users/${localStorage.getItem("user")}`
         );
-        
+        const newScore = userResp.data?.score || 0;
+
+        messageApi.success(
+          `Покупка успешно оформлена! Код: ${
+            response.data.code
+          }. Начислено баллов: ${Math.round(
+            Number(amount) / 25
+          )}. Всего баллов: ${newScore}`
+        );
+
         // Показываем уведомление о доставке сразу
-        messageApi.success({
+        antdMessage.open({
+          type: "success",
           content: (
             <div className="flex items-center gap-3">
               <span className="text-2xl">🚚</span>
               <div>
-                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="font-bold text-green-600">
+                  Спасибо за покупку!
+                </div>
                 <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
               </div>
             </div>
@@ -208,16 +227,21 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
           duration: 8,
         });
       } catch (scoreErr) {
-        messageApi.warning("Покупка прошла успешно, но не удалось начислить баллы");
+        messageApi.warning(
+          "Покупка прошла успешно, но не удалось начислить баллы"
+        );
         console.error("Score update error:", scoreErr);
-        
+
         // Показываем уведомление о доставке даже если не удалось начислить баллы
-        messageApi.success({
+        antdMessage.open({
+          type: "success",
           content: (
             <div className="flex items-center gap-3">
               <span className="text-2xl">🚚</span>
               <div>
-                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="font-bold text-green-600">
+                  Спасибо за покупку!
+                </div>
                 <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
               </div>
             </div>
@@ -240,11 +264,10 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
         setDiscount(0);
         setAmount(0);
       }, 2000);
-      
+
       // Обновляем количество баллов пользователя
       const userResp = await api.get(`/users/${localStorage.getItem("user")}`);
       setUserScore(userResp.data?.score || 0);
-      
     } catch (err) {
       messageApi.error(
         "Ошибка при оформлении: " + (err.response?.data?.error || err.message)
@@ -300,7 +323,7 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
             Очистить корзину
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex кол sm:flex-row gap-2">
             <Input
               type="text"
               className="w-full sm:w-1/2 h-10 px-3 py-1 box-border rounded-2xl border border-[#9b9999]"
@@ -334,27 +357,29 @@ const BuyingShopNoScroll = ({ price, count, refProp, productsRef }) => {
           </div>
 
           <div className="flex justify-between">
-            <h1 className="text-3xl font-arial !font-semibold">Итого</h1>
-            <h1 className="text-3xl font-arial !font-semibold">{Number(amount) || 0} ₽</h1>
+            <h1 className="text-3xl font-arial !фont-semibold">Итого</h1>
+            <h1 className="text-3xl font-arial !фont-semibold">
+              {Number(amount) || 0} ₽
+            </h1>
           </div>
 
           {userScore > 0 && (
             <Button
-              disabled={isPayingWithPoints || amount <= 0 || userScore < Number(amount)}
+              disabled={
+                isPayingWithPoints || amount <= 0 || userScore < Number(amount)
+              }
               className={`flex justify-center items-center w-full rounded-2xl !font-Arial text-xl text-white ${
-                userScore >= Number(amount) && Number(amount) > 0 
-                  ? "bg-[#8a2be2] hover:bg-[#7a1be2]" 
+                userScore >= Number(amount) && Number(amount) > 0
+                  ? "bg-[#8a2be2] hover:bg-[#7a1be2]"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
               onClick={handlePayWithPoints}
             >
-              {isPayingWithPoints ? (
-                "Обработка..."
-              ) : userScore < Number(amount) ? (
-                `Недостаточно баллов (${userScore}/${Number(amount)})`
-              ) : (
-                `Оплатить баллами (${userScore} баллов)`
-              )}
+              {isPayingWithPoints
+                ? "Обработка..."
+                : userScore < Number(amount)
+                ? `Недостаточно баллов (${userScore}/${Number(amount)})`
+                : `Оплатить баллами (${userScore} баллов)`}
             </Button>
           )}
 

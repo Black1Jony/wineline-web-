@@ -119,26 +119,35 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
 
       // Начисляем баллы за покупку
       try {
-        await api.post("/user/score", { 
-          id: localStorage.getItem("user"), 
-          amount: Number(amount) 
+        await api.post("/user/score", {
+          id: localStorage.getItem("user"),
+          amount: Number(amount),
         });
-        
+
         // Получаем обновленное количество баллов
-        const userResp = await api.get(`/users/${localStorage.getItem("user")}`);
-        const newScore = userResp.data?.score || 0;
-        
-        messageApi.success(
-          `Покупка успешно оформлена! Код: ${response.data.code}. Начислено баллов: ${Math.round(Number(amount) / 25)}. Всего баллов: ${newScore}`
+        const userResp = await api.get(
+          `/users/${localStorage.getItem("user")}`
         );
-        
+        const newScore = userResp.data?.score || 0;
+
+        messageApi.success(
+          `Покупка успешно оформлена! Код: ${
+            response.data.code
+          }. Начислено баллов: ${Math.round(
+            Number(amount) / 25
+          )}. Всего баллов: ${newScore}`
+        );
+
         // Показываем уведомление о доставке сразу
-        messageApi.success({
+        antdMessage.open({
+          type: "success",
           content: (
             <div className="flex items-center gap-3">
               <span className="text-2xl">🚚</span>
               <div>
-                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="font-bold text-green-600">
+                  Спасибо за покупку!
+                </div>
                 <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
               </div>
             </div>
@@ -146,16 +155,21 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
           duration: 8,
         });
       } catch (scoreErr) {
-        messageApi.warning("Покупка прошла успешно, но не удалось начислить баллы");
+        messageApi.warning(
+          "Покупка прошла успешно, но не удалось начислить баллы"
+        );
         console.error("Score update error:", scoreErr);
-        
+
         // Показываем уведомление о доставке даже если не удалось начислить баллы
-        messageApi.success({
+        antdMessage.open({
+          type: "success",
           content: (
             <div className="flex items-center gap-3">
               <span className="text-2xl">🚚</span>
               <div>
-                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="font-bold text-green-600">
+                  Спасибо за покупку!
+                </div>
                 <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
               </div>
             </div>
@@ -178,11 +192,10 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
         setDiscount(0);
         setAmount(0);
       }, 2000);
-      
+
       // Обновляем количество баллов пользователя
       const userResp = await api.get(`/users/${localStorage.getItem("user")}`);
       setUserScore(userResp.data?.score || 0);
-      
     } catch (err) {
       messageApi.error(
         "Ошибка при оформлении: " + (err.response?.data?.error || err.message)
@@ -201,7 +214,11 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
       return;
     }
     if (userScore < Number(amount)) {
-      messageApi.warning(`Недостаточно баллов. Доступно: ${userScore}, требуется: ${Number(amount)}`);
+      messageApi.warning(
+        `Недостаточно баллов. Доступно: ${userScore}, требуется: ${Number(
+          amount
+        )}`
+      );
       return;
     }
     setIsPayingWithPoints(true);
@@ -210,24 +227,31 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
         messageApi.error("Сумма должна быть положительной");
         return;
       }
-      
+
       // Списываем баллы через специальный эндпоинт
       await api.post(`/user/score/minus`, { id: uid, amount: Number(amount) });
-      
+
       // Получаем обновленное количество баллов
       const userResp = await api.get(`/users/${uid}`);
       const newScore = userResp.data?.score || 0;
-      
-      messageApi.success(`Оплата баллами прошла успешно! Потрачено баллов: ${Number(amount)}. Остаток: ${newScore}`);
+
+      messageApi.success(
+        `Оплата баллами прошла успешно! Потрачено баллов: ${Number(
+          amount
+        )}. Остаток: ${newScore}`
+      );
 
       // Показываем уведомление о доставке
       setTimeout(() => {
-        messageApi.success({
+        antdMessage.open({
+          type: "success",
           content: (
             <div className="flex items-center gap-3">
               <span className="text-2xl">🚚</span>
               <div>
-                <div className="font-bold text-green-600">Спасибо за покупку!</div>
+                <div className="font-bold text-green-600">
+                  Спасибо за покупку!
+                </div>
                 <div className="text-sm">Ожидайте курьера в течение 3 дней</div>
               </div>
             </div>
@@ -240,10 +264,9 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
       deleteAll();
       localStorage.removeItem("shop-storage");
       await api.delete(`/shop/${uid}`);
-      
+
       // Обновляем количество баллов
       setUserScore(newScore);
-      
     } catch (err) {
       messageApi.error(
         err?.response?.data?.message || "Ошибка при оплате баллами"
@@ -294,9 +317,9 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
           {/* Очистка корзины */}
           <div
             className="text-2xl font-Arial !font-semibold text-[#c2c2c2] cursor-pointer"
-            onClick={async() => {
+            onClick={async () => {
               deleteAll();
-              await api.delete(`/shop/${localStorage.getItem('user')}`)
+              await api.delete(`/shop/${localStorage.getItem("user")}`);
               localStorage.removeItem("shop-storage");
               messageApi.success("Корзина очищена!");
             }}
@@ -349,21 +372,21 @@ const BuyingShop = ({ price, count, refProp, isScrollable }) => {
           {/* Оплата баллами */}
           {userScore > 0 && (
             <Button
-              disabled={isPayingWithPoints || amount <= 0 || userScore < Number(amount)}
+              disabled={
+                isPayingWithPoints || amount <= 0 || userScore < Number(amount)
+              }
               className={`flex justify-center items-center w-full rounded-2xl !font-Arial text-xl text-white ${
-                userScore >= Number(amount) && Number(amount) > 0 
-                  ? "bg-[#8a2be2] hover:bg-[#7a1be2]" 
+                userScore >= Number(amount) && Number(amount) > 0
+                  ? "bg-[#8a2be2] hover:bg-[#7a1be2]"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
               onClick={handlePayWithPoints}
             >
-              {isPayingWithPoints ? (
-                "Обработка..."
-              ) : userScore < Number(amount) ? (
-                `Недостаточно баллов (${userScore}/${Number(amount)})`
-              ) : (
-                `Оплатить баллами (${userScore} баллов)`
-              )}
+              {isPayingWithPoints
+                ? "Обработка..."
+                : userScore < Number(amount)
+                ? `Недостаточно баллов (${userScore}/${Number(amount)})`
+                : `Оплатить баллами (${userScore} баллов)`}
             </Button>
           )}
 
