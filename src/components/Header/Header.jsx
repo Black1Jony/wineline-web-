@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+ import { useState, useEffect } from "react";
 import "./header.css";
 import { useNavigate } from "react-router-dom";
 import InputPlaceHolder from "../Input/InputPlaceHolder";
